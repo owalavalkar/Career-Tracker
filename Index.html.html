@@ -1,0 +1,2383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Career Transition Engine — Finance OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07090f;
+    --surface: #0d1117;
+    --surface2: #131921;
+    --surface3: #1a2232;
+    --border: rgba(255,255,255,0.06);
+    --border2: rgba(255,255,255,0.12);
+    --accent: #00d4ff;
+    --accent2: #0077ff;
+    --gold: #f0c040;
+    --green: #00e88a;
+    --red: #ff3b5c;
+    --orange: #ff8c00;
+    --text: #e8edf5;
+    --text2: #8b95a8;
+    --text3: #4a5568;
+    --cat: #7c3aed;
+    --cfa: #0077ff;
+    --deloitte: #00873d;
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+    --font-serif: 'Libre Baskerville', serif;
+    --radius: 8px;
+    --radius2: 14px;
+    --shadow: 0 4px 40px rgba(0,0,0,0.6);
+    --glow: 0 0 20px rgba(0,212,255,0.15);
+  }
+  [data-lang="de"] .en { display: none !important; }
+  [data-lang="en"] .de { display: none !important; }
+  [data-mode="cat"] .mode-cfa, [data-mode="cat"] .mode-deloitte { opacity: 0.35; }
+  [data-mode="cfa"] .mode-cat, [data-mode="cfa"] .mode-deloitte { opacity: 0.35; }
+  [data-mode="deloitte"] .mode-cat, [data-mode="deloitte"] .mode-cfa { opacity: 0.35; }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-image: 
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(0,119,255,0.08) 0%, transparent 70%),
+      url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.015'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  /* ── LAYOUT ── */
+  .app-shell { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+  
+  /* ── SIDEBAR ── */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    padding: 0;
+    position: sticky; top: 0; height: 100vh;
+    overflow-y: auto;
+  }
+  .sidebar-backdrop {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 199;
+    backdrop-filter: blur(2px);
+  }
+  .sidebar-backdrop.open { display: block; }
+  .sidebar-close-btn {
+    display: none;
+    position: absolute; top: 14px; right: 14px;
+    width: 30px; height: 30px; border-radius: 6px;
+    border: 1px solid var(--border2); background: var(--surface2);
+    color: var(--text2); font-size: 16px; cursor: pointer;
+    align-items: center; justify-content: center;
+    line-height: 1;
+  }
+  .sidebar-logo {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .logo-mark {
+    font-family: var(--font-display);
+    font-size: 22px;
+    letter-spacing: 3px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    display: block;
+  }
+  .logo-sub { font-size: 9px; letter-spacing: 2px; color: var(--text3); text-transform: uppercase; margin-top: 2px; font-family: var(--font-mono); }
+  
+  .xp-bar-wrap { padding: 16px 20px; border-bottom: 1px solid var(--border); }
+  .xp-level { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .xp-title { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); font-family: var(--font-mono); }
+  .xp-pts { font-size: 11px; color: var(--text2); font-family: var(--font-mono); }
+  .xp-bar { height: 3px; background: var(--surface3); border-radius: 2px; overflow: hidden; }
+  .xp-fill { height: 100%; background: linear-gradient(90deg, var(--gold), #ff9500); border-radius: 2px; transition: width 0.5s cubic-bezier(.22,1,.36,1); }
+  .xp-rank { font-size: 12px; color: var(--text); font-weight: 500; margin-top: 6px; }
+
+  .nav-section { padding: 16px 12px 8px; }
+  .nav-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text3); padding: 0 8px 8px; font-family: var(--font-mono); }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px; border-radius: var(--radius);
+    cursor: pointer; color: var(--text2); font-size: 13px;
+    transition: all 0.15s; font-weight: 400; border: none; background: none; width: 100%; text-align: left;
+  }
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active { background: rgba(0,212,255,0.08); color: var(--accent); font-weight: 500; }
+  .nav-item .icon { font-size: 15px; width: 18px; text-align: center; }
+
+  .mode-switcher { padding: 16px; border-top: 1px solid var(--border); margin-top: auto; }
+  .mode-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; font-family: var(--font-mono); }
+  .mode-btns { display: flex; flex-direction: column; gap: 4px; }
+  .mode-btn {
+    padding: 7px 10px; border-radius: var(--radius); border: 1px solid var(--border);
+    background: transparent; color: var(--text2); font-size: 12px; cursor: pointer;
+    text-align: left; transition: all 0.15s; font-family: var(--font-body);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .mode-btn:hover { border-color: var(--border2); color: var(--text); }
+  .mode-btn.active-cat { border-color: var(--cat); color: var(--cat); background: rgba(124,58,237,0.08); }
+  .mode-btn.active-cfa { border-color: var(--cfa); color: var(--cfa); background: rgba(0,119,255,0.08); }
+  .mode-btn.active-deloitte { border-color: var(--deloitte); color: var(--deloitte); background: rgba(0,135,61,0.08); }
+  .mode-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+  .lang-toggle { display: flex; gap: 4px; padding: 12px 16px 16px; }
+  .lang-btn { flex: 1; padding: 6px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--text3); font-size: 11px; cursor: pointer; transition: all 0.15s; font-family: var(--font-mono); }
+  .lang-btn.active { background: var(--surface3); color: var(--text); border-color: var(--border2); }
+
+  /* ── MAIN ── */
+  .main { display: flex; flex-direction: column; min-height: 100vh; }
+  .topbar {
+    padding: 16px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(13,17,23,0.8); backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .topbar-left { display: flex; flex-direction: column; }
+  .topbar-section { font-size: 20px; font-weight: 600; color: var(--text); font-family: var(--font-body); }
+  .topbar-date { font-size: 11px; color: var(--text3); font-family: var(--font-mono); margin-top: 2px; }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .streak-badge {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(240,192,64,0.1); border: 1px solid rgba(240,192,64,0.25);
+    padding: 6px 12px; border-radius: 20px;
+    font-size: 12px; color: var(--gold); font-family: var(--font-mono);
+  }
+
+  .content { padding: 28px 32px; flex: 1; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── SECTION TITLES ── */
+  .sec-title {
+    font-family: var(--font-display);
+    font-size: 28px; letter-spacing: 2px;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .sec-sub { color: var(--text2); font-size: 13px; margin-bottom: 24px; }
+
+  /* ── GRID HELPERS ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-auto { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius2);
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--border2); }
+  .card-title { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text3); margin-bottom: 12px; font-family: var(--font-mono); }
+  .card-big-num { font-size: 42px; font-family: var(--font-display); letter-spacing: 1px; line-height: 1; }
+  .card-meta { font-size: 11px; color: var(--text3); margin-top: 6px; font-family: var(--font-mono); }
+
+  /* ── STATS ROW ── */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius2);
+    padding: 16px 18px;
+    position: relative; overflow: hidden;
+  }
+  .stat-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  }
+  .stat-card.cat::before { background: var(--cat); }
+  .stat-card.cfa::before { background: var(--cfa); }
+  .stat-card.lang::before { background: var(--gold); }
+  .stat-card.xp::before { background: var(--green); }
+  .stat-num { font-family: var(--font-display); font-size: 36px; letter-spacing: 1px; line-height: 1.1; }
+  .stat-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); margin-top: 4px; font-family: var(--font-mono); }
+  .stat-delta { font-size: 11px; margin-top: 8px; font-family: var(--font-mono); }
+  .delta-up { color: var(--green); }
+  .delta-down { color: var(--red); }
+
+  /* ── POMODORO ── */
+  .pomo-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius2);
+    padding: 28px;
+    text-align: center;
+    position: relative;
+  }
+  .pomo-ring-wrap { position: relative; width: 160px; height: 160px; margin: 0 auto 20px; }
+  .pomo-ring { transform: rotate(-90deg); }
+  .pomo-ring-bg { fill: none; stroke: var(--surface3); stroke-width: 6; }
+  .pomo-ring-fill { fill: none; stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+  .pomo-time {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    font-family: var(--font-display); font-size: 38px; letter-spacing: 2px; color: var(--text);
+  }
+  .pomo-mode-badge {
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+    font-family: var(--font-mono); position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, 120%); color: var(--text3);
+  }
+  .pomo-controls { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    padding: 8px 18px; border-radius: 6px; border: 1px solid var(--border2);
+    background: var(--surface2); color: var(--text); font-size: 12px;
+    cursor: pointer; transition: all 0.15s; font-family: var(--font-body);
+    font-weight: 500;
+  }
+  .btn:hover { background: var(--surface3); border-color: rgba(255,255,255,0.2); }
+  .btn-accent { background: rgba(0,212,255,0.12); border-color: rgba(0,212,255,0.3); color: var(--accent); }
+  .btn-accent:hover { background: rgba(0,212,255,0.2); }
+  .btn-danger { background: rgba(255,59,92,0.1); border-color: rgba(255,59,92,0.25); color: var(--red); }
+  .btn-danger:hover { background: rgba(255,59,92,0.2); }
+  .btn-gold { background: rgba(240,192,64,0.1); border-color: rgba(240,192,64,0.25); color: var(--gold); }
+  .btn-gold:hover { background: rgba(240,192,64,0.2); }
+  .btn-green { background: rgba(0,232,138,0.1); border-color: rgba(0,232,138,0.25); color: var(--green); }
+
+  .pomo-session-log { margin-top: 16px; max-height: 130px; overflow-y: auto; }
+  .pomo-log-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 10px; border-radius: 6px; font-size: 11px;
+    margin-bottom: 4px; background: var(--surface2); font-family: var(--font-mono);
+  }
+  .interrupt-tag { color: var(--red); font-size: 10px; }
+  .study-tag { color: var(--green); font-size: 10px; }
+
+  /* ── GANTT / ROADMAP ── */
+  .roadmap-wrap { overflow-x: auto; }
+  .gantt {
+    min-width: 900px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius2); padding: 20px;
+  }
+  .gantt-header { display: grid; gap: 0; margin-bottom: 12px; }
+  .gantt-months { display: flex; gap: 0; margin-bottom: 8px; }
+  .gantt-month {
+    font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--text3); font-family: var(--font-mono);
+    text-align: center; padding: 0 4px; flex: 1;
+    border-right: 1px solid var(--border);
+  }
+  .gantt-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .gantt-track-label { font-size: 11px; color: var(--text2); width: 130px; flex-shrink: 0; font-family: var(--font-mono); }
+  .gantt-bar-area { flex: 1; height: 24px; background: var(--surface2); border-radius: 4px; position: relative; overflow: hidden; }
+  .gantt-bar {
+    position: absolute; height: 100%; border-radius: 4px;
+    display: flex; align-items: center; padding: 0 8px;
+    font-size: 9px; letter-spacing: 1px; font-family: var(--font-mono);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .today-line {
+    position: absolute; top: 0; bottom: 0; width: 2px;
+    background: var(--accent); z-index: 5;
+  }
+  .today-line::after {
+    content: 'TODAY'; position: absolute; top: -18px; left: 50%;
+    transform: translateX(-50%); font-size: 7px; color: var(--accent);
+    font-family: var(--font-mono); letter-spacing: 1px; white-space: nowrap;
+  }
+
+  /* ── KNOWLEDGE BRIDGE ── */
+  .bridge-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .input, .textarea, .select {
+    background: var(--surface2); border: 1px solid var(--border2);
+    border-radius: var(--radius); color: var(--text); font-family: var(--font-body);
+    font-size: 13px; padding: 10px 12px; outline: none;
+    transition: border-color 0.15s; width: 100%;
+  }
+  .textarea { resize: vertical; min-height: 70px; }
+  .input:focus, .textarea:focus, .select:focus { border-color: var(--accent); }
+  .select option { background: var(--surface2); }
+  .row { display: flex; gap: 10px; }
+  .row > * { flex: 1; }
+
+  .bridge-entry {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px; margin-bottom: 8px;
+    position: relative;
+  }
+  .bridge-raw { font-size: 12px; color: var(--text3); font-family: var(--font-mono); margin-bottom: 6px; }
+  .bridge-arrow { color: var(--accent); font-size: 14px; margin-right: 4px; }
+  .bridge-translated { font-size: 13px; color: var(--text); font-style: italic; font-family: var(--font-serif); }
+  .entry-date { position: absolute; top: 10px; right: 12px; font-size: 10px; color: var(--text3); font-family: var(--font-mono); }
+  .entry-tag {
+    display: inline-block; font-size: 9px; letter-spacing: 1px; text-transform: uppercase;
+    padding: 2px 7px; border-radius: 10px; margin-top: 6px; font-family: var(--font-mono);
+  }
+  .tag-cat { background: rgba(124,58,237,0.15); color: var(--cat); }
+  .tag-cfa { background: rgba(0,119,255,0.15); color: var(--cfa); }
+  .tag-deal { background: rgba(240,192,64,0.15); color: var(--gold); }
+
+  /* ── TAX DICT ── */
+  .dict-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .dict-card {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px;
+  }
+  .dict-term { font-family: var(--font-mono); font-size: 13px; color: var(--accent); margin-bottom: 4px; }
+  .dict-tax { font-size: 11px; color: var(--text2); margin-bottom: 8px; }
+  .dict-impact-label { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); margin-bottom: 4px; }
+  .dict-impact { font-size: 12px; color: var(--text); font-family: var(--font-serif); font-style: italic; }
+
+  /* ── DEAL ROOM ── */
+  .deal-table { width: 100%; border-collapse: collapse; }
+  .deal-table th {
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--text3); padding: 8px 12px; text-align: left;
+    border-bottom: 1px solid var(--border); font-family: var(--font-mono);
+  }
+  .deal-table td {
+    padding: 11px 12px; border-bottom: 1px solid var(--border);
+    font-size: 12px; color: var(--text2); vertical-align: top;
+  }
+  .deal-table td:first-child { color: var(--text); font-weight: 500; }
+  .deal-table tr:hover td { background: var(--surface2); }
+  .deal-val { color: var(--green); font-family: var(--font-mono); font-size: 11px; }
+  .deal-tax-badge {
+    font-size: 9px; padding: 2px 7px; border-radius: 10px;
+    background: rgba(240,192,64,0.12); color: var(--gold);
+    font-family: var(--font-mono); display: inline-block; margin-top: 2px;
+  }
+
+  /* ── GERMAN ── */
+  .phrase-card {
+    background: linear-gradient(135deg, rgba(0,119,255,0.08), rgba(0,212,255,0.04));
+    border: 1px solid rgba(0,212,255,0.15);
+    border-radius: var(--radius2); padding: 28px; text-align: center;
+    margin-bottom: 16px;
+  }
+  .phrase-de { font-family: var(--font-serif); font-size: 22px; color: var(--text); margin-bottom: 6px; font-style: italic; }
+  .phrase-en { font-size: 13px; color: var(--text2); margin-bottom: 12px; }
+  .phrase-cat { font-size: 10px; color: var(--accent); letter-spacing: 1.5px; text-transform: uppercase; font-family: var(--font-mono); }
+
+  .streak-display {
+    display: flex; gap: 4px; flex-wrap: wrap; margin-top: 12px;
+  }
+  .streak-dot {
+    width: 20px; height: 20px; border-radius: 4px;
+    background: var(--surface3);
+    transition: background 0.3s;
+    position: relative;
+  }
+  .streak-dot.done { background: var(--accent2); }
+  .streak-dot.today { background: var(--accent); box-shadow: 0 0 8px rgba(0,212,255,0.4); }
+
+  /* ── NETWORKING CRM ── */
+  .crm-table { width: 100%; border-collapse: collapse; }
+  .crm-table th {
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--text3); padding: 8px 12px; border-bottom: 1px solid var(--border);
+    text-align: left; font-family: var(--font-mono);
+  }
+  .crm-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 12px; color: var(--text2); }
+  .crm-table tr:hover td { background: var(--surface2); }
+  .contact-name { font-weight: 500; color: var(--text); }
+  .contact-firm { font-size: 11px; color: var(--text3); }
+  .status-badge {
+    font-size: 9px; padding: 2px 8px; border-radius: 10px;
+    font-family: var(--font-mono); letter-spacing: 0.5px;
+  }
+  .s-warm { background: rgba(0,232,138,0.12); color: var(--green); }
+  .s-cold { background: rgba(139,149,168,0.12); color: var(--text3); }
+  .s-hot { background: rgba(255,140,0,0.12); color: var(--orange); }
+
+  /* ── ERROR TRACKER ── */
+  .error-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+  .error-card {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 12px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .error-card.critical { border-color: rgba(255,59,92,0.4); background: rgba(255,59,92,0.05); animation: pulse-red 2s infinite; }
+  @keyframes pulse-red { 0%,100% { border-color: rgba(255,59,92,0.4); } 50% { border-color: rgba(255,59,92,0.8); } }
+  .error-topic { font-size: 13px; color: var(--text); font-weight: 500; }
+  .error-cat { font-size: 10px; color: var(--text3); margin-top: 2px; font-family: var(--font-mono); }
+  .error-count {
+    font-family: var(--font-display); font-size: 28px;
+    color: var(--text3);
+  }
+  .error-card.critical .error-count { color: var(--red); }
+  .error-card.warn .error-count { color: var(--orange); }
+  .error-actions { display: flex; gap: 4px; margin-top: 6px; }
+  .err-btn {
+    font-size: 10px; padding: 3px 8px; border-radius: 4px; border: 1px solid var(--border);
+    background: transparent; color: var(--text3); cursor: pointer; font-family: var(--font-mono);
+  }
+  .err-btn:hover { border-color: var(--border2); color: var(--text); }
+
+  .critical-alert {
+    background: rgba(255,59,92,0.08); border: 1px solid rgba(255,59,92,0.25);
+    border-radius: var(--radius); padding: 12px 16px; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--red);
+    font-family: var(--font-mono);
+  }
+
+  /* ── BURNOUT ANALYTICS ── */
+  .burnout-bar-wrap { margin-bottom: 10px; }
+  .burnout-bar-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--text2); margin-bottom: 4px; font-family: var(--font-mono); }
+  .burnout-bar { height: 8px; background: var(--surface3); border-radius: 4px; overflow: hidden; }
+  .burnout-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+  .burnout-study { background: linear-gradient(90deg, var(--green), #00a860); }
+  .burnout-interrupt { background: linear-gradient(90deg, var(--red), #cc2244); }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+  /* ── TABS (within sections) ── */
+  .sub-tabs { display: flex; gap: 4px; margin-bottom: 20px; }
+  .sub-tab {
+    padding: 7px 16px; border-radius: 6px; border: 1px solid var(--border);
+    background: transparent; color: var(--text3); font-size: 12px;
+    cursor: pointer; transition: all 0.15s; font-family: var(--font-body);
+  }
+  .sub-tab:hover { border-color: var(--border2); color: var(--text2); }
+  .sub-tab.active { background: var(--surface2); border-color: var(--border2); color: var(--text); }
+
+  .sub-tab-panel { display: none; }
+  .sub-tab-panel.active { display: block; }
+
+  /* ── DELETE BTN ── */
+  .del-btn {
+    position: absolute; top: 8px; right: 8px;
+    background: none; border: none; color: var(--text3);
+    cursor: pointer; font-size: 14px; opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .bridge-entry:hover .del-btn { opacity: 1; }
+  .del-btn:hover { color: var(--red); }
+
+  /* ── PHRASE REFRESH ── */
+  .phrase-nav { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .app-shell { grid-template-columns: 1fr; }
+    .sidebar { position: fixed; left: -240px; top: 0; z-index: 200; transition: left 0.3s cubic-bezier(.22,1,.36,1); height: 100vh; }
+    .sidebar.open { left: 0; }
+    .sidebar-close-btn { display: flex !important; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .content { padding: 16px; }
+    .topbar { padding: 12px 16px; }
+    .mobile-menu-btn { display: flex !important; }
+  }
+  .mobile-menu-btn {
+    display: none; align-items: center; justify-content: center;
+    width: 36px; height: 36px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--surface2);
+    color: var(--text); cursor: pointer; font-size: 16px;
+  }
+  .sidebar-close-btn {
+    display: none; position: absolute; top: 16px; right: 12px;
+    background: var(--surface3); border: 1px solid var(--border2);
+    color: var(--text2); border-radius: 6px;
+    width: 28px; height: 28px; font-size: 14px; cursor: pointer;
+    align-items: center; justify-content: center;
+    line-height: 1;
+  }
+  .sidebar-overlay, .sidebar-backdrop {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 199;
+    backdrop-filter: blur(2px);
+  }
+  .sidebar-overlay.open, .sidebar-backdrop.open { display: block; }
+  @media (max-width: 768px) {
+    .sidebar-close-btn { display: flex; }
+  }
+
+  /* ── HABIT TRACKER ── */
+  .habit-overview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .habit-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius2); overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .habit-card:hover { border-color: var(--border2); }
+  .habit-card-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 18px 12px;
+  }
+  .habit-icon-wrap {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+  .habit-name { font-size: 15px; font-weight: 600; color: var(--text); }
+  .habit-goal { font-size: 11px; color: var(--text3); font-family: var(--font-mono); margin-top: 1px; }
+  .habit-check-today {
+    margin-left: auto; width: 34px; height: 34px; border-radius: 50%;
+    border: 2px solid var(--border2); background: transparent;
+    cursor: pointer; font-size: 16px; color: var(--text3);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; flex-shrink: 0;
+  }
+  .habit-check-today.done { background: var(--green); border-color: var(--green); color: #fff; }
+  .habit-check-today:hover:not(.done) { border-color: var(--green); color: var(--green); }
+
+  .habit-stats-row { display: flex; gap: 0; border-top: 1px solid var(--border); }
+  .habit-stat { flex: 1; padding: 10px 12px; text-align: center; border-right: 1px solid var(--border); }
+  .habit-stat:last-child { border-right: none; }
+  .habit-stat-num { font-family: var(--font-display); font-size: 22px; line-height: 1; }
+  .habit-stat-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text3); font-family: var(--font-mono); margin-top: 2px; }
+
+  .habit-mini-cal { padding: 10px 14px 14px; }
+  .habit-mini-cal-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text3); font-family: var(--font-mono); margin-bottom: 6px; }
+  .habit-dots { display: flex; gap: 3px; flex-wrap: wrap; }
+  .habit-dot { width: 14px; height: 14px; border-radius: 3px; background: var(--surface3); cursor: default; transition: transform 0.1s; }
+  .habit-dot:hover { transform: scale(1.2); }
+  .habit-dot.done-dot { }
+  .habit-dot.today-dot { ring: 2px solid white; }
+
+  .habit-progress-bar-wrap { padding: 0 14px 14px; }
+  .habit-progress-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--text3); font-family: var(--font-mono); margin-bottom: 4px; }
+  .habit-progress-bar { height: 4px; background: var(--surface3); border-radius: 2px; overflow: hidden; }
+  .habit-progress-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
+
+  .habit-actions { display: flex; gap: 6px; padding: 0 14px 14px; }
+
+  /* Heatmap */
+  .heatmap-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius2); padding: 20px; margin-bottom: 20px; }
+  .heatmap-title { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text3); font-family: var(--font-mono); margin-bottom: 14px; }
+  .heatmap-grid { display: flex; gap: 3px; overflow-x: auto; }
+  .heatmap-col { display: flex; flex-direction: column; gap: 3px; }
+  .heatmap-cell { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; }
+  .heatmap-month-labels { display: flex; gap: 3px; margin-bottom: 4px; font-size: 9px; color: var(--text3); font-family: var(--font-mono); overflow-x: auto; }
+
+  /* Add habit form */
+  .habit-color-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .color-swatch {
+    width: 28px; height: 28px; border-radius: 6px; cursor: pointer;
+    border: 2px solid transparent; transition: border-color 0.15s;
+  }
+  .color-swatch.selected { border-color: white; }
+  .emoji-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .emoji-opt {
+    width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border2);
+    background: var(--surface2); cursor: pointer; font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .emoji-opt.selected, .emoji-opt:hover { border-color: var(--accent); background: rgba(0,212,255,0.08); }
+
+  /* Weekly summary bar */
+  .weekly-habit-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .weekly-habit-row:last-child { border-bottom: none; }
+  .weekly-habit-name { width: 140px; flex-shrink: 0; font-size: 13px; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .weekly-dots { display: flex; gap: 4px; }
+  .wday-dot { width: 22px; height: 22px; border-radius: 5px; background: var(--surface3); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text3); font-family: var(--font-mono); transition: all 0.15s; }
+  .wday-dot.hit { color: white; }
+  .weekly-pct { font-family: var(--font-mono); font-size: 12px; color: var(--text3); margin-left: auto; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--surface2); border: 1px solid var(--border2);
+    border-radius: var(--radius); padding: 12px 18px;
+    font-size: 13px; color: var(--text);
+    box-shadow: var(--shadow); z-index: 9999;
+    transform: translateY(20px); opacity: 0;
+    transition: all 0.3s cubic-bezier(.22,1,.36,1);
+    max-width: 300px;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { border-color: rgba(0,232,138,0.3); }
+  .toast.warning { border-color: rgba(255,140,0,0.3); }
+
+  /* ── LOADING PULSE ── */
+  @keyframes shimmer { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
+  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: shimmer 2s infinite; display: inline-block; }
+
+  /* ── ADD FORM MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    z-index: 500; display: none; align-items: center; justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border2);
+    border-radius: var(--radius2); padding: 28px; width: 480px;
+    max-width: 95vw; max-height: 90vh; overflow-y: auto;
+  }
+  .modal-title { font-family: var(--font-display); font-size: 22px; letter-spacing: 1px; margin-bottom: 20px; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+  .label { font-size: 11px; color: var(--text3); margin-bottom: 4px; font-family: var(--font-mono); letter-spacing: 1px; display: block; }
+
+  /* ── HOME DASHBOARD ── */
+  .phase-banner {
+    background: linear-gradient(135deg, rgba(0,119,255,0.1), rgba(0,212,255,0.04));
+    border: 1px solid rgba(0,212,255,0.12);
+    border-radius: var(--radius2); padding: 20px 24px; margin-bottom: 20px;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .phase-icon { font-size: 32px; }
+  .phase-name { font-family: var(--font-display); font-size: 20px; letter-spacing: 2px; color: var(--accent); }
+  .phase-desc { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .phase-dates { font-size: 10px; font-family: var(--font-mono); color: var(--text3); margin-top: 4px; }
+  .phase-priorities { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .phase-prio {
+    font-size: 10px; padding: 3px 10px; border-radius: 10px;
+    font-family: var(--font-mono); border: 1px solid;
+  }
+  .prio-cat { border-color: var(--cat); color: var(--cat); background: rgba(124,58,237,0.08); }
+  .prio-cfa { border-color: var(--cfa); color: var(--cfa); background: rgba(0,119,255,0.08); }
+  .prio-del { border-color: var(--deloitte); color: var(--deloitte); background: rgba(0,135,61,0.08); }
+
+  /* Quick add area */
+  .quick-add-row { display: flex; gap: 8px; margin-bottom: 16px; }
+
+  /* Countdown */
+  .countdown-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  .countdown-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px; text-align: center;
+  }
+  .countdown-days { font-family: var(--font-display); font-size: 44px; letter-spacing: 2px; line-height: 1; }
+  .countdown-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); font-family: var(--font-mono); margin-top: 4px; }
+  .countdown-event { font-size: 11px; color: var(--text2); margin-top: 4px; }
+</style>
+</head>
+<body data-lang="en" data-mode="cat">
+
+<!-- SIDEBAR BACKDROP -->
+<div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<div class="app-shell">
+<aside class="sidebar" id="sidebar">
+  <button class="sidebar-close-btn" onclick="closeSidebar()">✕</button>
+  <div class="sidebar-logo">
+    <span class="logo-mark">AXIOM</span>
+    <span class="logo-sub en">Career Transition Engine</span>
+    <span class="logo-sub de">Karriere-Übergangs-Engine</span>
+  </div>
+
+  <div class="xp-bar-wrap">
+    <div class="xp-level">
+      <span class="xp-title" id="xp-rank-label">Junior Analyst</span>
+      <span class="xp-pts" id="xp-pts-display">0 XP</span>
+    </div>
+    <div class="xp-bar"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+    <div class="xp-rank" id="xp-rank-full">→ Associate <span style="color:var(--text3);font-size:11px">at 500 XP</span></div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label en">Dashboard</div>
+    <div class="nav-label de">Übersicht</div>
+    <button class="nav-item active" onclick="switchTab('home', this)">
+      <span class="icon">⬡</span> <span class="en">Command Center</span><span class="de">Kommandozentrale</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('roadmap', this)">
+      <span class="icon">◈</span> <span class="en">Roadmap</span><span class="de">Zeitplan</span>
+    </button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label en">Study Engine</div>
+    <div class="nav-label de">Lernmaschine</div>
+    <button class="nav-item mode-cat" onclick="switchTab('timer', this)">
+      <span class="icon">◷</span> <span class="en">Pomodoro</span><span class="de">Pomodoro</span>
+    </button>
+    <button class="nav-item mode-cat" onclick="switchTab('errors', this)">
+      <span class="icon">⚠</span> <span class="en">Error Tracker</span><span class="de">Fehlerprotokoll</span>
+    </button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label en">Finance Bridge</div>
+    <div class="nav-label de">Finanzbrücke</div>
+    <button class="nav-item mode-cfa" onclick="switchTab('bridge', this)">
+      <span class="icon">⇄</span> <span class="en">Narrative Builder</span><span class="de">Narrativ</span>
+    </button>
+    <button class="nav-item mode-cfa" onclick="switchTab('taxdict', this)">
+      <span class="icon">⊞</span> <span class="en">Tax → IB Dictionary</span><span class="de">Steuer-Wörterbuch</span>
+    </button>
+    <button class="nav-item mode-cfa" onclick="switchTab('dealroom', this)">
+      <span class="icon">◉</span> <span class="en">Deal Room</span><span class="de">Deal-Raum</span>
+    </button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label en">Global Readiness</div>
+    <div class="nav-label de">Globale Bereitschaft</div>
+    <button class="nav-item" onclick="switchTab('german', this)">
+      <span class="icon">🇩🇪</span> <span class="en">German Streak</span><span class="de">Deutschstreak</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('crm', this)">
+      <span class="icon">◈</span> <span class="en">Network CRM</span><span class="de">Netzwerk CRM</span>
+    </button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label en">Lifestyle</div>
+    <div class="nav-label de">Lebensstil</div>
+    <button class="nav-item" onclick="switchTab('habits', this)">
+      <span class="icon">◆</span> <span class="en">Habit Tracker</span><span class="de">Gewohnheits-Tracker</span>
+    </button>
+  </div>
+
+  <div class="mode-switcher">
+    <div class="mode-label en">Focus Mode</div>
+    <div class="mode-label de">Fokusmodus</div>
+    <div class="mode-btns">
+      <button class="mode-btn active-cat" id="mode-cat" onclick="setMode('cat')">
+        <span class="mode-dot" style="background:var(--cat)"></span>
+        <span class="en">CAT Focus</span><span class="de">CAT-Fokus</span>
+      </button>
+      <button class="mode-btn" id="mode-cfa" onclick="setMode('cfa')">
+        <span class="mode-dot" style="background:var(--cfa)"></span>
+        <span class="en">CFA / Finance</span><span class="de">CFA / Finanzen</span>
+      </button>
+      <button class="mode-btn" id="mode-deloitte" onclick="setMode('deloitte')">
+        <span class="mode-dot" style="background:var(--deloitte)"></span>
+        <span class="en">Deloitte Mode</span><span class="de">Deloitte-Modus</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="lang-toggle">
+    <button class="lang-btn active" id="lang-en" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" id="lang-de" onclick="setLang('de')">DE</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+      <div class="topbar-left">
+        <div class="topbar-section" id="topbar-title">Command Center</div>
+        <div class="topbar-date" id="topbar-date"></div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="streak-badge"><span class="live-dot"></span> <span id="streak-top">0 day streak</span></div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══ HOME ══ -->
+    <div class="tab-panel active" id="tab-home">
+      <div class="phase-banner" id="phase-banner"></div>
+
+      <div class="countdown-grid">
+        <div class="countdown-card">
+          <div class="countdown-days" id="cd-cat" style="color:var(--cat)">--</div>
+          <div class="countdown-label">Days to CAT</div>
+          <div class="countdown-event">Nov 2026</div>
+        </div>
+        <div class="countdown-card">
+          <div class="countdown-days" id="cd-ielts" style="color:var(--accent)">--</div>
+          <div class="countdown-label">Days to IELTS</div>
+          <div class="countdown-event">Jun 2027</div>
+        </div>
+        <div class="countdown-card">
+          <div class="countdown-days" id="cd-german" style="color:var(--gold)">--</div>
+          <div class="countdown-label">Days to B2</div>
+          <div class="countdown-event">Jun 2027</div>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card cat">
+          <div class="stat-num" id="stat-sessions" style="color:var(--cat)">0</div>
+          <div class="stat-label en">Study Sessions</div>
+          <div class="stat-label de">Lernsitzungen</div>
+          <div class="stat-delta delta-up" id="stat-sessions-delta">+ this week</div>
+        </div>
+        <div class="stat-card cfa">
+          <div class="stat-num" id="stat-entries" style="color:var(--cfa)">0</div>
+          <div class="stat-label en">Bridge Entries</div>
+          <div class="stat-label de">Brückeneinträge</div>
+          <div class="stat-delta" id="stat-entries-delta" style="color:var(--text3)">IB translations</div>
+        </div>
+        <div class="stat-card lang">
+          <div class="stat-num" id="stat-streak" style="color:var(--gold)">0</div>
+          <div class="stat-label en">German Streak</div>
+          <div class="stat-label de">Deutschstreak</div>
+          <div class="stat-delta delta-up" id="stat-streak-delta">days</div>
+        </div>
+        <div class="stat-card xp">
+          <div class="stat-num" id="stat-xp" style="color:var(--green)">0</div>
+          <div class="stat-label en">Total XP</div>
+          <div class="stat-label de">Gesamt-XP</div>
+          <div class="stat-delta delta-up" id="stat-xp-rank">Junior Analyst</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Today's focus -->
+        <div class="card" style="grid-column:1">
+          <div class="card-title en">Today's Priority Log</div>
+          <div class="card-title de">Heutiges Prioritätsprotokoll</div>
+          <div id="today-tasks" style="margin-bottom:12px"></div>
+          <div style="display:flex;gap:8px">
+            <input class="input" id="task-input" placeholder="Add today's priority..." style="flex:1">
+            <button class="btn btn-accent" onclick="addTask()">+ <span class="en">Add</span><span class="de">Hinzufügen</span></button>
+          </div>
+        </div>
+
+        <!-- Quick XP -->
+        <div class="card" style="grid-column:2">
+          <div class="card-title en">Earn XP</div>
+          <div class="card-title de">XP verdienen</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <button class="btn" onclick="awardXP(50, 'Completed mock test')">+50 XP — Mock Test Completed</button>
+            <button class="btn" onclick="awardXP(30, 'Mastered tax concept')">+30 XP — Tax Concept Mastered</button>
+            <button class="btn" onclick="awardXP(25, 'Bridge entry logged')">+25 XP — Bridge Entry Logged</button>
+            <button class="btn" onclick="awardXP(20, 'Deal Room entry added')">+20 XP — Deal Room Entry</button>
+            <button class="btn" onclick="awardXP(15, 'German daily done')">+15 XP — German Daily Completed</button>
+            <button class="btn" onclick="awardXP(10, 'CRM contact added')">+10 XP — Network Contact Added</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ROADMAP ══ -->
+    <div class="tab-panel" id="tab-roadmap">
+      <div class="sec-title en">STRATEGIC ROADMAP</div>
+      <div class="sec-title de">STRATEGISCHER ZEITPLAN</div>
+      <div class="sec-sub en">18-month career transition: Tax Technology → Investment Banking / IIM</div>
+      <div class="sec-sub de">18-monatiger Karrierewechsel: Steuertechnologie → Investmentbanking / IIM</div>
+
+      <div class="roadmap-wrap">
+        <div class="gantt" id="gantt-chart"></div>
+      </div>
+
+      <div style="margin-top:24px">
+        <div class="sec-title" style="font-size:22px;margin-bottom:16px">PHASE DETAILS</div>
+        <div class="grid-2" id="phase-cards"></div>
+      </div>
+    </div>
+
+    <!-- ══ TIMER ══ -->
+    <div class="tab-panel" id="tab-timer">
+      <div class="sec-title en">PROFESSIONAL POMODORO</div>
+      <div class="sec-title de">PROFESSIONELLER POMODORO</div>
+      <div class="sec-sub en">Study sessions with interruption tracking and burnout analytics</div>
+      <div class="sec-sub de">Lernsitzungen mit Unterbrechungsprotokoll und Burnout-Analytik</div>
+
+      <div class="grid-2">
+        <div>
+          <div class="pomo-wrap">
+            <div class="pomo-ring-wrap">
+              <svg class="pomo-ring" width="160" height="160" viewBox="0 0 160 160">
+                <circle class="pomo-ring-bg" cx="80" cy="80" r="68"/>
+                <circle class="pomo-ring-fill" id="pomo-ring-fill" cx="80" cy="80" r="68"
+                  stroke="var(--accent)" stroke-dasharray="427" stroke-dashoffset="427"/>
+              </svg>
+              <div class="pomo-time" id="pomo-display">25:00</div>
+              <div class="pomo-mode-badge" id="pomo-mode-badge">FOCUS</div>
+            </div>
+
+            <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px">
+              <button class="btn btn-accent" id="pomo-start" onclick="pomodoroStart()">▶ <span class="en">Start</span><span class="de">Start</span></button>
+              <button class="btn" onclick="pomodoroReset()">↺ <span class="en">Reset</span><span class="de">Reset</span></button>
+              <button class="btn btn-danger" onclick="logInterrupt()">⚡ <span class="en">Interrupted!</span><span class="de">Unterbrochen!</span></button>
+            </div>
+
+            <div class="pomo-controls">
+              <button class="btn" onclick="setPomoDuration(25, 'FOCUS')">25 min</button>
+              <button class="btn" onclick="setPomoDuration(50, 'DEEP WORK')">50 min</button>
+              <button class="btn btn-gold" onclick="setPomoDuration(5, 'BREAK')">5 min break</button>
+            </div>
+
+            <div class="pomo-session-log" id="pomo-log"></div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <!-- Burnout Analytics -->
+          <div class="card">
+            <div class="card-title en">This Week's Burnout Analytics</div>
+            <div class="card-title de">Burnout-Analytik dieser Woche</div>
+            <div id="burnout-bars"></div>
+            <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:6px">
+                <span id="en" class="en">Study Time</span><span id="de" class="de">Lernzeit</span>
+                <span id="study-total" style="font-family:var(--font-mono);color:var(--green)">0 min</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2)">
+                <span class="en">Interruptions</span><span class="de">Unterbrechungen</span>
+                <span id="interrupt-total" style="font-family:var(--font-mono);color:var(--red)">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Session subject -->
+          <div class="card">
+            <div class="card-title en">Current Session Context</div>
+            <div class="card-title de">Aktueller Sitzungskontext</div>
+            <label class="label">Subject</label>
+            <select class="select" id="pomo-subject">
+              <option>CAT — Quantitative Aptitude</option>
+              <option>CAT — DILR</option>
+              <option>CAT — VARC</option>
+              <option>CFA — Financial Reporting & Analysis</option>
+              <option>CFA — Corporate Finance</option>
+              <option>CFA — Ethics</option>
+              <option>CFA — Fixed Income</option>
+              <option>German Language</option>
+              <option>Tax Tech — Deloitte Work</option>
+              <option>Financial Modeling</option>
+              <option>Networking</option>
+            </select>
+            <label class="label" style="margin-top:10px">Notes (optional)</label>
+            <input class="input" id="pomo-notes" placeholder="What will you accomplish?">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ BRIDGE ══ -->
+    <div class="tab-panel" id="tab-bridge">
+      <div class="sec-title en">NARRATIVE BUILDER</div>
+      <div class="sec-title de">NARRATIV-BUILDER</div>
+      <div class="sec-sub en">Translate Tax-Tech achievements into Investment Banking language</div>
+      <div class="sec-sub de">Übersetze Steuertech-Leistungen in Investment-Banking-Sprache</div>
+
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-title en">Log This Week's Translation</div>
+        <div class="card-title de">Diese Woche übersetzen</div>
+        <div class="bridge-form">
+          <div>
+            <label class="label en">What you actually did (Tax/Tech language)</label>
+            <label class="label de">Was du tatsächlich getan hast</label>
+            <input class="input" id="bridge-raw" placeholder="e.g. Fixed a bug in the ETR calculation tool">
+          </div>
+          <div>
+            <label class="label en">IB/Finance Translation</label>
+            <label class="label de">IB/Finanz-Übersetzung</label>
+            <textarea class="textarea" id="bridge-translated" placeholder="e.g. Optimized valuation data accuracy by resolving discrepancies in effective tax rate computation engine, reducing financial reporting risk by ~12%"></textarea>
+          </div>
+          <div class="row">
+            <div>
+              <label class="label en">Category</label>
+              <label class="label de">Kategorie</label>
+              <select class="select" id="bridge-cat">
+                <option value="cat">CAT Relevant</option>
+                <option value="cfa">CFA / Finance</option>
+                <option value="deal">Deal Structure</option>
+                <option value="tech">Tech Edge</option>
+              </select>
+            </div>
+            <div>
+              <label class="label en">Impact %</label>
+              <label class="label de">Auswirkung %</label>
+              <input class="input" id="bridge-impact" type="number" placeholder="e.g. 15" min="0" max="100">
+            </div>
+          </div>
+          <button class="btn btn-accent" onclick="addBridgeEntry(); awardXP(25,'Bridge entry')">
+            <span class="en">→ Save Translation</span>
+            <span class="de">→ Übersetzung speichern</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="bridge-entries"></div>
+    </div>
+
+    <!-- ══ TAX DICT ══ -->
+    <div class="tab-panel" id="tab-taxdict">
+      <div class="sec-title en">TAX → IB DICTIONARY</div>
+      <div class="sec-title de">STEUER → IB WÖRTERBUCH</div>
+      <div class="sec-sub en">Linking Tax concepts to their direct impact on Company Valuation & DCF Models</div>
+      <div class="sec-sub de">Steuerkonzepte mit Auswirkungen auf Unternehmensbewertung und DCF-Modelle verknüpfen</div>
+
+      <div class="dict-grid" id="dict-grid"></div>
+    </div>
+
+    <!-- ══ DEAL ROOM ══ -->
+    <div class="tab-panel" id="tab-dealroom">
+      <div class="sec-title en">DEAL ROOM</div>
+      <div class="sec-title de">DEAL-RAUM</div>
+      <div class="sec-sub en">Track one major M&A deal per week — understand the tax structure</div>
+      <div class="sec-sub de">Ein wichtiges M&A-Deal pro Woche verfolgen — Steuerstruktur verstehen</div>
+
+      <div style="margin-bottom:16px">
+        <button class="btn btn-accent" onclick="openDealModal()">
+          + <span class="en">Log New Deal</span><span class="de">Neuen Deal erfassen</span>
+        </button>
+      </div>
+
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="deal-table" id="deal-table">
+          <thead>
+            <tr>
+              <th class="en">Buyer / Target</th><th class="de">Käufer / Ziel</th>
+              <th class="en">Value</th><th class="de">Wert</th>
+              <th class="en">Industry</th><th class="de">Branche</th>
+              <th class="en">Tax Structure</th><th class="de">Steuerstruktur</th>
+              <th class="en">Key Lesson</th><th class="de">Schlüsselerkenntnis</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="deal-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ GERMAN ══ -->
+    <div class="tab-panel" id="tab-german">
+      <div class="sec-title en">GERMAN FINANCE STREAK</div>
+      <div class="sec-title de">DEUTSCHSTREAK FINANZEN</div>
+      <div class="sec-sub">Finanzdeutsch · A1 → B2 Journey</div>
+
+      <div class="grid-2">
+        <div>
+          <div class="phrase-card" id="phrase-card">
+            <div class="phrase-de" id="phrase-de"></div>
+            <div class="phrase-en" id="phrase-en"></div>
+            <div class="phrase-cat" id="phrase-level"></div>
+          </div>
+          <div class="phrase-nav">
+            <button class="btn" onclick="prevPhrase()">← Prev</button>
+            <button class="btn btn-accent" onclick="markDoneToday(); nextPhrase()">
+              ✓ <span class="en">Done for Today</span><span class="de">Heute erledigt</span>
+            </button>
+            <button class="btn" onclick="nextPhrase()">Next →</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title en">30-Day Streak Calendar</div>
+          <div class="card-title de">30-Tage-Streakkalender</div>
+          <div class="streak-display" id="streak-calendar"></div>
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+            <div class="card-big-num" id="streak-num" style="color:var(--gold)">0</div>
+            <div class="card-meta en">day streak · keep it going!</div>
+            <div class="card-meta de">Tage-Streak · weiter so!</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px">
+        <div class="card">
+          <div class="card-title en">German Level Progress</div>
+          <div class="card-title de">Deutschfortschritt</div>
+          <div id="german-progress" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CRM ══ -->
+    <div class="tab-panel" id="tab-crm">
+      <div class="sec-title en">NETWORK CRM</div>
+      <div class="sec-title de">NETZWERK-CRM</div>
+      <div class="sec-sub en">Track outreach to IIM alumni and Germany finance professionals</div>
+      <div class="sec-sub de">Kontaktpflege zu IIM-Alumni und deutschen Finanzprofis</div>
+
+      <div style="margin-bottom:16px">
+        <button class="btn btn-accent" onclick="openCRMModal()">
+          + <span class="en">Add Contact</span><span class="de">Kontakt hinzufügen</span>
+        </button>
+      </div>
+
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="crm-table">
+          <thead><tr>
+            <th class="en">Contact</th><th class="de">Kontakt</th>
+            <th>Firm</th>
+            <th class="en">Last Contacted</th><th class="de">Letzter Kontakt</th>
+            <th>Status</th>
+            <th class="en">Key Insight</th><th class="de">Schlüsselerkenntnis</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="crm-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ ERRORS ══ -->
+    <div class="tab-panel" id="tab-errors">
+      <div class="sec-title en">SMART ERROR LOG</div>
+      <div class="sec-title de">INTELLIGENTES FEHLERPROTOKOLL</div>
+      <div class="sec-sub en">Track concept mistakes. 3× errors = mandatory review alert</div>
+      <div class="sec-sub de">3× Fehler = Pflichtwiederholung</div>
+
+      <div id="error-alert" class="critical-alert" style="display:none">
+        🚨 <span id="error-alert-text"></span>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+        <input class="input" id="error-topic-input" placeholder="Concept or topic..." style="flex:1;min-width:180px">
+        <select class="select" id="error-subject-select" style="width:180px">
+          <option>CAT — Algebra</option>
+          <option>CAT — Geometry</option>
+          <option>CAT — Number System</option>
+          <option>CAT — DILR Sets</option>
+          <option>CAT — Reading Comprehension</option>
+          <option>CFA — Fixed Income</option>
+          <option>CFA — Derivatives</option>
+          <option>CFA — Ethics</option>
+          <option>CFA — FRA</option>
+          <option>Financial Modeling</option>
+          <option>German Grammar</option>
+          <option>Tax Concepts</option>
+        </select>
+        <button class="btn btn-danger" onclick="addError()">+ Log Error</button>
+      </div>
+
+      <div class="error-grid" id="error-grid"></div>
+    </div>
+
+    <!-- ══ HABITS ══ -->
+    <div class="tab-panel" id="tab-habits">
+      <div class="sec-title en">HABIT TRACKER</div>
+      <div class="sec-title de">GEWOHNHEITS-TRACKER</div>
+      <div class="sec-sub en">Build the disciplines that compound your career transition — tracked daily</div>
+      <div class="sec-sub de">Baue Gewohnheiten auf, die deinen Karrierewechsel beschleunigen</div>
+
+      <!-- Top action bar -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+        <button class="btn btn-accent" onclick="openHabitModal()">+ <span class="en">New Habit</span><span class="de">Neue Gewohnheit</span></button>
+        <div style="display:flex;gap:4px;margin-left:auto">
+          <button class="sub-tab active" id="hview-cards" onclick="setHabitView('cards',this)">Cards</button>
+          <button class="sub-tab" id="hview-weekly" onclick="setHabitView('weekly',this)">Weekly</button>
+          <button class="sub-tab" id="hview-heatmap" onclick="setHabitView('heatmap',this)">Heatmap</button>
+        </div>
+      </div>
+
+      <!-- Today's check-in strip -->
+      <div class="card" style="margin-bottom:20px;padding:16px 20px" id="today-checkin-strip">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div class="card-title" style="margin-bottom:0;en">TODAY'S CHECK-IN</div>
+          <div id="checkin-score" style="font-family:var(--font-mono);font-size:12px;color:var(--text3)">0 / 0 done</div>
+        </div>
+        <div id="today-checkin-row" style="display:flex;gap:10px;flex-wrap:wrap"></div>
+      </div>
+
+      <!-- Cards view -->
+      <div id="habit-view-cards">
+        <div class="habit-overview-grid" id="habit-cards-grid"></div>
+        <div id="habit-empty" style="display:none;text-align:center;padding:60px 20px;color:var(--text3);font-family:var(--font-mono);font-size:13px">
+          No habits yet. Add your first habit above to start tracking. 🎯
+        </div>
+      </div>
+
+      <!-- Weekly view -->
+      <div id="habit-view-weekly" style="display:none">
+        <div class="card">
+          <div class="card-title">THIS WEEK — DAY BY DAY</div>
+          <div style="display:flex;gap:4px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)">
+            <div style="width:148px;flex-shrink:0"></div>
+            <div class="weekly-dots" id="weekly-day-labels"></div>
+          </div>
+          <div id="weekly-habit-list"></div>
+        </div>
+      </div>
+
+      <!-- Heatmap view -->
+      <div id="habit-view-heatmap" style="display:none">
+        <div id="heatmap-container"></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+</div><!-- /app-shell -->
+
+<!-- DEAL MODAL -->
+<div class="modal-overlay" id="deal-modal">
+  <div class="modal">
+    <div class="modal-title en">LOG M&A DEAL</div>
+    <div class="modal-title de">M&A-DEAL ERFASSEN</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div><label class="label">Buyer</label><input class="input" id="dm-buyer" placeholder="e.g. JPMorgan Chase"></div>
+      <div><label class="label">Target</label><input class="input" id="dm-target" placeholder="e.g. First Republic Bank"></div>
+      <div><label class="label">Deal Value</label><input class="input" id="dm-value" placeholder="e.g. $10.6B"></div>
+      <div><label class="label">Industry</label><input class="input" id="dm-industry" placeholder="e.g. Financial Services"></div>
+      <div><label class="label">Tax Structure</label>
+        <select class="select" id="dm-taxtype">
+          <option>Stock Deal (carryover basis)</option>
+          <option>Asset Purchase (step-up basis)</option>
+          <option>Merger (tax-free reorganization)</option>
+          <option>LBO (interest deductibility)</option>
+          <option>Cross-border (transfer pricing)</option>
+          <option>SPV / Holding Structure</option>
+        </select>
+      </div>
+      <div><label class="label">Key Lesson / Tax Impact</label>
+        <textarea class="textarea" id="dm-lesson" placeholder="What did you learn about the deal's tax implications?"></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeDealModal()">Cancel</button>
+      <button class="btn btn-accent" onclick="saveDeal(); awardXP(20,'Deal room entry')">Save Deal</button>
+    </div>
+  </div>
+</div>
+
+<!-- CRM MODAL -->
+<div class="modal-overlay" id="crm-modal">
+  <div class="modal">
+    <div class="modal-title en">ADD CONTACT</div>
+    <div class="modal-title de">KONTAKT HINZUFÜGEN</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div><label class="label">Full Name</label><input class="input" id="crm-name" placeholder="e.g. Rahul Mehta"></div>
+      <div><label class="label">Firm / Institution</label><input class="input" id="crm-firm" placeholder="e.g. Goldman Sachs / IIM-A Alumni"></div>
+      <div><label class="label">Role</label><input class="input" id="crm-role" placeholder="e.g. VP — M&A Tax Advisory"></div>
+      <div><label class="label">Platform</label>
+        <select class="select" id="crm-platform">
+          <option>LinkedIn</option>
+          <option>Email</option>
+          <option>WhatsApp</option>
+          <option>Event / Conference</option>
+          <option>Referral</option>
+        </select>
+      </div>
+      <div><label class="label">Status</label>
+        <select class="select" id="crm-status">
+          <option value="cold">Cold — Not yet reached</option>
+          <option value="warm">Warm — Replied / Engaged</option>
+          <option value="hot">Hot — Meeting scheduled</option>
+        </select>
+      </div>
+      <div><label class="label">Key Insight</label>
+        <textarea class="textarea" id="crm-insight" placeholder="What did you learn or what's the ask?"></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeCRMModal()">Cancel</button>
+      <button class="btn btn-accent" onclick="saveCRM(); awardXP(10,'CRM contact')">Save Contact</button>
+    </div>
+  </div>
+</div>
+
+<!-- HABIT MODAL -->
+<div class="modal-overlay" id="habit-modal">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-title" id="habit-modal-title">NEW HABIT</div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div>
+        <label class="label">Habit Name</label>
+        <input class="input" id="hm-name" placeholder="e.g. Morning Exercise, Reading, Meditation">
+      </div>
+      <div>
+        <label class="label">Icon</label>
+        <div class="emoji-row" id="hm-emoji-row">
+          <div class="emoji-opt selected" data-emoji="💪" onclick="selectEmoji(this)">💪</div>
+          <div class="emoji-opt" data-emoji="📖" onclick="selectEmoji(this)">📖</div>
+          <div class="emoji-opt" data-emoji="🧘" onclick="selectEmoji(this)">🧘</div>
+          <div class="emoji-opt" data-emoji="🏃" onclick="selectEmoji(this)">🏃</div>
+          <div class="emoji-opt" data-emoji="💧" onclick="selectEmoji(this)">💧</div>
+          <div class="emoji-opt" data-emoji="🛌" onclick="selectEmoji(this)">🛌</div>
+          <div class="emoji-opt" data-emoji="✍️" onclick="selectEmoji(this)">✍️</div>
+          <div class="emoji-opt" data-emoji="🎯" onclick="selectEmoji(this)">🎯</div>
+          <div class="emoji-opt" data-emoji="🥗" onclick="selectEmoji(this)">🥗</div>
+          <div class="emoji-opt" data-emoji="📝" onclick="selectEmoji(this)">📝</div>
+          <div class="emoji-opt" data-emoji="🎸" onclick="selectEmoji(this)">🎸</div>
+          <div class="emoji-opt" data-emoji="🌅" onclick="selectEmoji(this)">🌅</div>
+        </div>
+      </div>
+      <div>
+        <label class="label">Color</label>
+        <div class="habit-color-row" id="hm-color-row">
+          <div class="color-swatch selected" data-color="#00e88a" style="background:#00e88a" onclick="selectColor(this)"></div>
+          <div class="color-swatch" data-color="#00d4ff" style="background:#00d4ff" onclick="selectColor(this)"></div>
+          <div class="color-swatch" data-color="#7c3aed" style="background:#7c3aed" onclick="selectColor(this)"></div>
+          <div class="color-swatch" data-color="#0077ff" style="background:#0077ff" onclick="selectColor(this)"></div>
+          <div class="color-swatch" data-color="#f0c040" style="background:#f0c040" onclick="selectColor(this)"></div>
+          <div class="color-swatch" data-color="#ff8c00" style="background:#ff8c00" onclick="selectColor(this)"></div>
+          <div class="color-swatch" data-color="#ff3b5c" style="background:#ff3b5c" onclick="selectColor(this)"></div>
+          <div class="color-swatch" data-color="#e879f9" style="background:#e879f9" onclick="selectColor(this)"></div>
+        </div>
+      </div>
+      <div>
+        <label class="label">Daily Goal / Description</label>
+        <input class="input" id="hm-goal" placeholder="e.g. 30 min workout, 20 pages, 10 min meditation">
+      </div>
+      <div>
+        <label class="label">Target Days Per Week</label>
+        <select class="select" id="hm-frequency">
+          <option value="7">Every day (7/7)</option>
+          <option value="6">6 days a week</option>
+          <option value="5">5 days a week (weekdays)</option>
+          <option value="4">4 days a week</option>
+          <option value="3">3 days a week</option>
+          <option value="2">2 days a week</option>
+        </select>
+      </div>
+      <div>
+        <label class="label">Category</label>
+        <select class="select" id="hm-category">
+          <option value="health">Health & Fitness</option>
+          <option value="mind">Mind & Learning</option>
+          <option value="career">Career Growth</option>
+          <option value="wellness">Wellness & Rest</option>
+          <option value="social">Social & Relationships</option>
+          <option value="creative">Creative</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeHabitModal()">Cancel</button>
+      <button class="btn btn-accent" id="hm-save-btn" onclick="saveHabit()">Save Habit</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════
+// STATE & STORAGE
+// ═══════════════════════════════════════════
+const S = {
+  get(k, d) { try { return JSON.parse(localStorage.getItem('axiom_'+k)) ?? d; } catch { return d; } },
+  set(k, v) { localStorage.setItem('axiom_'+k, JSON.stringify(v)); }
+};
+
+let state = {
+  xp: S.get('xp', 0),
+  sessions: S.get('sessions', 0),
+  tasks: S.get('tasks', []),
+  bridge: S.get('bridge', []),
+  deals: S.get('deals', []),
+  crm: S.get('crm', []),
+  errors: S.get('errors', []),
+  streak: S.get('streak', 0),
+  streakDays: S.get('streakDays', []),
+  lastStreakDate: S.get('lastStreakDate', null),
+  phraseIdx: S.get('phraseIdx', 0),
+  weekStudy: S.get('weekStudy', 0),
+  weekInterrupts: S.get('weekInterrupts', 0),
+  dailyDone: S.get('dailyDone', false),
+  pomolog: S.get('pomolog', []),
+  mode: S.get('mode', 'cat'),
+  lang: S.get('lang', 'en'),
+  habits: S.get('habits', []),
+  habitLogs: S.get('habitLogs', {}), // { 'habitId': ['2026-05-01', ...] }
+};
+function save() {
+  Object.keys(state).forEach(k => S.set(k, state[k]));
+}
+
+// ═══════════════════════════════════════════
+// XP SYSTEM
+// ═══════════════════════════════════════════
+const RANKS = [
+  { title: 'Junior Analyst', min: 0, next: 500 },
+  { title: 'Associate', min: 500, next: 1500 },
+  { title: 'Senior Associate', min: 1500, next: 3500 },
+  { title: 'Vice President', min: 3500, next: 7000 },
+  { title: 'Director', min: 7000, next: 12000 },
+  { title: 'Managing Director', min: 12000, next: Infinity },
+];
+function getRank(xp) {
+  return RANKS.slice().reverse().find(r => xp >= r.min) || RANKS[0];
+}
+function awardXP(pts, reason) {
+  state.xp += pts;
+  save();
+  updateXP();
+  showToast(`+${pts} XP — ${reason}`, 'success');
+}
+function updateXP() {
+  const rank = getRank(state.xp);
+  const next = RANKS[RANKS.indexOf(rank)+1];
+  const pct = next ? ((state.xp - rank.min)/(next.min - rank.min)*100) : 100;
+  document.getElementById('xp-rank-label').textContent = rank.title;
+  document.getElementById('xp-pts-display').textContent = state.xp + ' XP';
+  document.getElementById('xp-fill').style.width = Math.min(pct, 100) + '%';
+  document.getElementById('xp-rank-full').innerHTML = next
+    ? `→ ${next.title} <span style="color:var(--text3);font-size:11px">at ${next.min} XP</span>`
+    : '🏆 Max Rank Achieved';
+  document.getElementById('stat-xp').textContent = state.xp;
+  document.getElementById('stat-xp-rank').textContent = rank.title;
+}
+
+// ═══════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════
+const tabTitles = {
+  home: 'Command Center',
+  roadmap: 'Strategic Roadmap',
+  timer: 'Professional Pomodoro',
+  bridge: 'Narrative Builder',
+  taxdict: 'Tax → IB Dictionary',
+  dealroom: 'Deal Room',
+  german: 'German Finance Streak',
+  crm: 'Network CRM',
+  errors: 'Smart Error Log',
+  habits: 'Habit Tracker'
+};
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.getElementById('topbar-title').textContent = tabTitles[id] || id;
+  if (id === 'home') updateHomeStats();
+  // Close sidebar on mobile after navigation
+  if (window.innerWidth <= 768) closeSidebar();
+}
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const isOpen = sidebar.classList.contains('open');
+  if (isOpen) {
+    closeSidebar();
+  } else {
+    sidebar.classList.add('open');
+    const overlay = document.getElementById('sidebar-backdrop') || document.getElementById('sidebar-overlay');
+    if (overlay) overlay.classList.add('open');
+  }
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  const backdrop = document.getElementById('sidebar-backdrop') || document.getElementById('sidebar-overlay');
+  if (backdrop) backdrop.classList.remove('open');
+}
+
+function setMode(m) {
+  state.mode = m;
+  save();
+  document.body.setAttribute('data-mode', m);
+  document.querySelectorAll('.mode-btn').forEach(b => b.className = 'mode-btn');
+  document.getElementById('mode-'+m).classList.add('active-'+m);
+}
+
+function setLang(l) {
+  state.lang = l;
+  save();
+  document.body.setAttribute('data-lang', l);
+  document.getElementById('lang-en').classList.toggle('active', l==='en');
+  document.getElementById('lang-de').classList.toggle('active', l==='de');
+}
+
+// ═══════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════
+let toastTimer;
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show ' + type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.className = 'toast', 2800);
+}
+
+// ═══════════════════════════════════════════
+// DATE HELPERS
+// ═══════════════════════════════════════════
+function daysUntil(y, m, d) {
+  const now = new Date(); now.setHours(0,0,0,0);
+  const target = new Date(y, m-1, d);
+  return Math.max(0, Math.round((target - now)/(86400000)));
+}
+function fmtDate(d) {
+  return new Date(d).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+}
+function todayStr() { return new Date().toISOString().slice(0,10); }
+
+// ═══════════════════════════════════════════
+// HOME
+// ═══════════════════════════════════════════
+const PHASES = [
+  { icon:'⚡', name:'THE GRIND', dates:'May 2026 – Oct 2026', desc:'CAT consistency & CFA fundamentals while delivering at Deloitte',
+    p1:{cls:'prio-cat',txt:'CAT: Quant/DILR consistency'}, p2:{cls:'prio-cfa',txt:'CFA L1: FRA & Corp Fin'}, p3:{cls:'prio-del',txt:'Tax AI features & tool development'} },
+  { icon:'🎯', name:'THE EXAM', dates:'Nov 2026', desc:'CAT execution. German A1 begins. Hold the line at Deloitte.',
+    p1:{cls:'prio-cat',txt:'CAT Exam — final mocks'}, p2:{cls:'prio-cat',txt:'German A1 vocabulary start'}, p3:{cls:'prio-del',txt:'Maintain Senior Exec deliverables'} },
+  { icon:'↗', name:'THE PIVOT', dates:'Dec 2026 – Feb 2027', desc:'CFA final push & German intensive. Network M&A Tax teams.',
+    p1:{cls:'prio-cfa',txt:'CFA L1 — final push'}, p2:{cls:'prio-cat',txt:'German A2/B1 intensive'}, p3:{cls:'prio-del',txt:'Network with M&A Tax teams'} },
+  { icon:'🚀', name:'THE LAUNCH', dates:'Mar 2027 – Jun 2027', desc:'IELTS, B-School apps, German B2 fluency. Graceful Deloitte exit.',
+    p1:{cls:'prio-cat',txt:'IELTS & B-School applications'}, p2:{cls:'prio-cat',txt:'German B2 fluency'}, p3:{cls:'prio-del',txt:'Wrap up Deloitte projects'} },
+];
+function getCurrentPhase() {
+  const now = new Date();
+  const m = now.getMonth()+1, y = now.getFullYear();
+  if (y < 2026 || (y===2026 && m < 11)) return 0;
+  if (y===2026 && m===11) return 1;
+  if ((y===2026 && m===12)||(y===2027 && m<=2)) return 2;
+  return 3;
+}
+function updateHomeStats() {
+  document.getElementById('stat-sessions').textContent = state.sessions;
+  document.getElementById('stat-entries').textContent = state.bridge.length;
+  document.getElementById('stat-streak').textContent = state.streak;
+  updateXP();
+  renderTasks();
+}
+function renderPhaseBanner() {
+  const p = PHASES[getCurrentPhase()];
+  document.getElementById('phase-banner').innerHTML = `
+    <div class="phase-icon">${p.icon}</div>
+    <div>
+      <div class="phase-name">${p.name}</div>
+      <div class="phase-desc">${p.desc}</div>
+      <div class="phase-dates">${p.dates}</div>
+      <div class="phase-priorities">
+        <span class="phase-prio ${p.p1.cls}">${p.p1.txt}</span>
+        <span class="phase-prio ${p.p2.cls}">${p.p2.txt}</span>
+        <span class="phase-prio ${p.p3.cls}">${p.p3.txt}</span>
+      </div>
+    </div>`;
+}
+function renderCountdowns() {
+  document.getElementById('cd-cat').textContent = daysUntil(2026,11,23);
+  document.getElementById('cd-ielts').textContent = daysUntil(2027,6,1);
+  document.getElementById('cd-german').textContent = daysUntil(2027,6,1);
+}
+
+// ── TASKS ──
+function addTask() {
+  const v = document.getElementById('task-input').value.trim();
+  if (!v) return;
+  state.tasks.unshift({ text: v, done: false, date: todayStr() });
+  document.getElementById('task-input').value = '';
+  save(); renderTasks();
+}
+function renderTasks() {
+  const el = document.getElementById('today-tasks');
+  const today = todayStr();
+  const items = state.tasks.filter(t => t.date === today).slice(0, 5);
+  el.innerHTML = items.length ? items.map((t, i) => `
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">
+      <input type="checkbox" ${t.done?'checked':''} onchange="toggleTask('${t.date}',${state.tasks.indexOf(t)})" style="accent-color:var(--accent)">
+      <span style="flex:1;font-size:13px;${t.done?'text-decoration:line-through;color:var(--text3)':''}">${t.text}</span>
+    </div>`).join('') : '<div style="color:var(--text3);font-size:12px;padding:8px 0;font-family:var(--font-mono)">No tasks yet today — add your first priority above</div>';
+}
+function toggleTask(date, idx) {
+  if (state.tasks[idx]) { state.tasks[idx].done = !state.tasks[idx].done; save(); renderTasks(); }
+}
+
+// ═══════════════════════════════════════════
+// ROADMAP / GANTT
+// ═══════════════════════════════════════════
+function renderGantt() {
+  const months = ['May 26','Jun 26','Jul 26','Aug 26','Sep 26','Oct 26','Nov 26','Dec 26','Jan 27','Feb 27','Mar 27','Apr 27','May 27','Jun 27'];
+  const total = months.length;
+  const now = new Date();
+  // Position of today in months from May 2026
+  const startDate = new Date(2026,4,1);
+  const diffMs = now - startDate;
+  const todayFrac = Math.max(0, Math.min(1, diffMs/(1000*60*60*24*30*total)));
+
+  const tracks = [
+    { label: 'CAT Preparation', color: 'var(--cat)', start: 0, end: 6, text: 'Quant · DILR · VARC' },
+    { label: 'CAT Exam', color: '#9f67ff', start: 6, end: 7, text: 'EXAM' },
+    { label: 'CFA Level 1', color: 'var(--cfa)', start: 1, end: 10, text: 'FRA · Corp Fin · Ethics' },
+    { label: 'German A1', color: 'var(--gold)', start: 6, end: 8, text: 'A1' },
+    { label: 'German A2/B1', color: '#e0a000', start: 8, end: 11, text: 'A2/B1 Intensive' },
+    { label: 'German B2', color: '#c88000', start: 11, end: 14, text: 'B2 Fluency' },
+    { label: 'IELTS Prep', color: 'var(--green)', start: 10, end: 13, text: 'IELTS' },
+    { label: 'B-School Apps', color: '#00a860', start: 10, end: 14, text: 'IIM / Germany' },
+    { label: 'Deloitte — Tax AI', color: 'var(--deloitte)', start: 0, end: 7, text: 'Tax AI features · Tools' },
+    { label: 'Networking — M&A', color: '#00b050', start: 7, end: 14, text: 'M&A Tax Teams · IIM Alumni' },
+  ];
+
+  let html = `<div class="gantt-months">
+    <div style="width:130px;flex-shrink:0"></div>
+    ${months.map(m=>`<div class="gantt-month" style="flex:1">${m}</div>`).join('')}
+  </div>`;
+
+  tracks.forEach(t => {
+    const leftPct = (t.start/total*100).toFixed(2);
+    const widthPct = ((t.end-t.start)/total*100).toFixed(2);
+    html += `<div class="gantt-row">
+      <div class="gantt-track-label">${t.label}</div>
+      <div class="gantt-bar-area" style="position:relative">
+        ${todayFrac > 0 ? `<div class="today-line" style="left:${(todayFrac*100).toFixed(2)}%"></div>` : ''}
+        <div class="gantt-bar" style="left:${leftPct}%;width:${widthPct}%;background:${t.color};opacity:0.85">
+          ${t.text}
+        </div>
+      </div>
+    </div>`;
+  });
+
+  document.getElementById('gantt-chart').innerHTML = html;
+
+  // Phase cards
+  const pc = document.getElementById('phase-cards');
+  pc.innerHTML = PHASES.map(p => `
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <span style="font-size:24px">${p.icon}</span>
+        <div>
+          <div style="font-family:var(--font-display);font-size:18px;letter-spacing:1px;color:var(--text)">${p.name}</div>
+          <div style="font-size:11px;color:var(--text3);font-family:var(--font-mono)">${p.dates}</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:12px">${p.desc}</div>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <div style="display:flex;align-items:center;gap:8px;font-size:11px">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0"></span>
+          <span style="color:var(--text2)">${p.p1.txt}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:11px">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0"></span>
+          <span style="color:var(--text2)">${p.p2.txt}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:11px">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0"></span>
+          <span style="color:var(--text2)">${p.p3.txt}</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════
+// POMODORO
+// ═══════════════════════════════════════════
+let pomoInterval = null, pomoSeconds = 25*60, pomoTotal = 25*60, pomoRunning = false;
+const CIRC = 427;
+
+function setPomoDuration(mins, label) {
+  if (pomoRunning) { pomodoroReset(); }
+  pomoTotal = mins * 60; pomoSeconds = pomoTotal;
+  document.getElementById('pomo-mode-badge').textContent = label;
+  updatePomoDisplay();
+}
+function updatePomoDisplay() {
+  const m = String(Math.floor(pomoSeconds/60)).padStart(2,'0');
+  const s = String(pomoSeconds%60).padStart(2,'0');
+  document.getElementById('pomo-display').textContent = m + ':' + s;
+  const pct = pomoSeconds/pomoTotal;
+  document.getElementById('pomo-ring-fill').style.strokeDashoffset = CIRC * pct;
+  const hue = pct > 0.5 ? 'var(--accent)' : pct > 0.2 ? 'var(--gold)' : 'var(--red)';
+  document.getElementById('pomo-ring-fill').style.stroke = hue;
+}
+function pomodoroStart() {
+  if (pomoRunning) {
+    clearInterval(pomoInterval); pomoRunning = false;
+    document.getElementById('pomo-start').innerHTML = '▶ <span>Start</span>';
+    return;
+  }
+  pomoRunning = true;
+  document.getElementById('pomo-start').innerHTML = '⏸ <span>Pause</span>';
+  pomoInterval = setInterval(() => {
+    if (pomoSeconds <= 0) {
+      clearInterval(pomoInterval); pomoRunning = false;
+      document.getElementById('pomo-start').innerHTML = '▶ <span>Start</span>';
+      state.sessions++;
+      const mins = Math.round(pomoTotal/60);
+      state.weekStudy += mins;
+      logSession('✓ ' + document.getElementById('pomo-subject').value, mins + 'min', false);
+      awardXP(30, 'Study session completed');
+      save(); updateHomeStats();
+    } else { pomoSeconds--; updatePomoDisplay(); }
+  }, 1000);
+}
+function pomodoroReset() {
+  clearInterval(pomoInterval); pomoRunning = false;
+  pomoSeconds = pomoTotal; updatePomoDisplay();
+  document.getElementById('pomo-start').innerHTML = '▶ <span>Start</span>';
+}
+function logInterrupt() {
+  const who = prompt('Who interrupted? (e.g. Dishank, Khushbu, or leave blank)') || 'Work';
+  state.weekInterrupts++;
+  const elapsed = Math.round((pomoTotal - pomoSeconds)/60);
+  logSession('⚡ INTERRUPTED by ' + who, elapsed + 'min lost', true);
+  pomodoroReset();
+  save(); renderBurnout();
+  showToast('Interruption logged. +0 XP. 💪 Refocus.', 'warning');
+}
+function logSession(label, time, isInterrupt) {
+  state.pomolog.unshift({ label, time, isInterrupt, ts: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) });
+  if (state.pomolog.length > 20) state.pomolog.pop();
+  save(); renderPomoLog(); renderBurnout();
+}
+function renderPomoLog() {
+  const el = document.getElementById('pomo-log');
+  el.innerHTML = state.pomolog.slice(0,10).map(l => `
+    <div class="pomo-log-item">
+      <span>${l.label}</span>
+      <span style="display:flex;gap:8px;align-items:center">
+        <span style="color:var(--text3)">${l.ts}</span>
+        <span class="${l.isInterrupt?'interrupt-tag':'study-tag'}">${l.time}</span>
+      </span>
+    </div>`).join('');
+}
+function renderBurnout() {
+  const study = state.weekStudy, interrupts = state.weekInterrupts;
+  const maxStudy = 300; // 5h ref
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  document.getElementById('burnout-bars').innerHTML = `
+    <div class="burnout-bar-wrap">
+      <div class="burnout-bar-label"><span>Study Focus</span><span>${study} min this week</span></div>
+      <div class="burnout-bar"><div class="burnout-fill burnout-study" style="width:${Math.min(100,study/maxStudy*100)}%"></div></div>
+    </div>
+    <div class="burnout-bar-wrap">
+      <div class="burnout-bar-label"><span>Interruptions</span><span>${interrupts} this week</span></div>
+      <div class="burnout-bar"><div class="burnout-fill burnout-interrupt" style="width:${Math.min(100,interrupts/15*100)}%"></div></div>
+    </div>`;
+  document.getElementById('study-total').textContent = study + ' min';
+  document.getElementById('interrupt-total').textContent = interrupts;
+  document.getElementById('streak-top').textContent = state.streak + ' day streak';
+}
+
+// ═══════════════════════════════════════════
+// BRIDGE
+// ═══════════════════════════════════════════
+function addBridgeEntry() {
+  const raw = document.getElementById('bridge-raw').value.trim();
+  const trans = document.getElementById('bridge-translated').value.trim();
+  if (!raw || !trans) { showToast('Fill in both fields', 'warning'); return; }
+  const cat = document.getElementById('bridge-cat').value;
+  const impact = document.getElementById('bridge-impact').value;
+  state.bridge.unshift({ raw, trans, cat, impact, date: todayStr() });
+  save(); renderBridge();
+  document.getElementById('bridge-raw').value = '';
+  document.getElementById('bridge-translated').value = '';
+  document.getElementById('bridge-impact').value = '';
+  showToast('Bridge entry saved!', 'success');
+}
+function renderBridge() {
+  const el = document.getElementById('bridge-entries');
+  el.innerHTML = state.bridge.map((e,i) => `
+    <div class="bridge-entry">
+      <button class="del-btn" onclick="deleteBridge(${i})">✕</button>
+      <div class="bridge-raw">📌 ${e.raw}</div>
+      <div><span class="bridge-arrow">→</span><span class="bridge-translated">${e.trans}</span></div>
+      ${e.impact ? `<div style="font-size:11px;color:var(--green);margin-top:4px;font-family:var(--font-mono)">▲ ${e.impact}% impact</div>` : ''}
+      <div class="entry-date">${fmtDate(e.date)}</div>
+      <span class="entry-tag tag-${e.cat}">${e.cat.toUpperCase()}</span>
+    </div>`).join('') || '<div style="color:var(--text3);font-family:var(--font-mono);font-size:12px;padding:20px 0;text-align:center">No entries yet. Log your first Tax→IB translation above.</div>';
+}
+function deleteBridge(i) {
+  state.bridge.splice(i,1); save(); renderBridge();
+}
+
+// ═══════════════════════════════════════════
+// TAX DICTIONARY
+// ═══════════════════════════════════════════
+const DICT = [
+  { term:'DTA / DTL', tax:'Deferred Tax Assets / Liabilities arise from timing differences in tax vs. book income.', impact:'DTAs inflate book equity. A large valuation allowance against DTA signals earnings quality risk. In DCF, normalized taxes matter more than book taxes.' },
+  { term:'Effective Tax Rate (ETR)', tax:'ETR = Tax Expense / Pre-tax Income. Differs from statutory rate due to permanent differences.', impact:'ETR compression boosts EPS. In LBO models, a lower ETR = higher FCFE. Acquirers scrutinize ETR sustainability in target diligence.' },
+  { term:'Transfer Pricing', tax:'Rules governing inter-company transactions at arm\'s length to prevent profit shifting.', impact:'In cross-border M&A, transfer pricing structures can shelter earnings. Aggressive TP can be a red flag—adds contingent tax liability to EV.' },
+  { term:'NOL Carryforward', tax:'Net Operating Loss can be carried forward to offset future taxable income (post-TCJA: 80% limit, indefinite carry).', impact:'NOLs are valuable in LBOs. Acquirers value targets with large NOLs as a tax shield. Section 382 limits NOL usage post-ownership change.' },
+  { term:'Section 338(h)(10)', tax:'Election to treat a stock deal as an asset purchase for tax purposes.', impact:'Step-up in asset basis = higher depreciation = lower taxes. Sellers face ordinary income tax; buyers get ~20-40% of deal value as extra PV from shield.' },
+  { term:'GILTI / BEAT', tax:'Global Intangible Low-Tax Income & Base Erosion Anti-Abuse Tax — US international tax provisions.', impact:'Multinational targets face GILTI inclusion. In DCF for MNCs, GILTI adds ~1-2% to effective tax rate, reducing free cash flow.' },
+  { term:'Step-up in Basis', tax:'In asset deals, assets are revalued to FMV, creating higher depreciable basis.', impact:'The tax amortization benefit (TAB) is a core component of purchase price allocation (PPA). Higher step-up = more intangible amortization = lower taxes = higher deal value to buyer.' },
+  { term:'EBITDA vs EBIT', tax:'EBIT = Earnings before Interest & Tax. EBITDA adds back depreciation (D&A).', impact:'D&A is a non-cash tax deduction. Companies with high D&A have lower cash taxes. In LBO, D&A shields EBIT from tax, improving FCFE.' },
+  { term:'Withholding Tax', tax:'Tax deducted at source on cross-border dividends, royalties, and interest.', impact:'In DCF of foreign subsidiaries, withholding tax reduces the after-tax dividend stream. Treaty rates (e.g., India-Germany: 10%) affect deal structuring via holding companies.' },
+  { term:'Tax Basis', tax:'The cost basis of an asset for tax purposes, affecting gain/loss on sale.', impact:'Built-in gains (FMV > tax basis) create contingent tax liabilities. In M&A diligence, hidden tax basis risk can reduce purchase price by 5-15%.' },
+  { term:'R&D Tax Credit', tax:'Credit against tax liability for qualifying research expenditures (Section 41).', impact:'Tech-heavy targets (like Tax Tech firms) often carry R&D credits. These offset tax and improve IRR in VC/PE models.' },
+  { term:'TCJA — 100% Bonus Depreciation', tax:'Tax Cuts & Jobs Act (2017) allowed immediate expensing of qualified assets (phasing down post-2022).', impact:'Accelerated depreciation front-loads tax deductions, improving cash flows in early LBO years. Critical in paper/manufacturing M&A.' },
+];
+function renderDict() {
+  document.getElementById('dict-grid').innerHTML = DICT.map(d => `
+    <div class="dict-card">
+      <div class="dict-term">${d.term}</div>
+      <div class="dict-tax">${d.tax}</div>
+      <div class="dict-impact-label">IB / Valuation Impact</div>
+      <div class="dict-impact">${d.impact}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════
+// DEAL ROOM
+// ═══════════════════════════════════════════
+function openDealModal() { document.getElementById('deal-modal').classList.add('open'); }
+function closeDealModal() { document.getElementById('deal-modal').classList.remove('open'); }
+function saveDeal() {
+  const d = {
+    buyer: document.getElementById('dm-buyer').value.trim(),
+    target: document.getElementById('dm-target').value.trim(),
+    value: document.getElementById('dm-value').value.trim(),
+    industry: document.getElementById('dm-industry').value.trim(),
+    taxtype: document.getElementById('dm-taxtype').value,
+    lesson: document.getElementById('dm-lesson').value.trim(),
+    date: todayStr()
+  };
+  if (!d.buyer || !d.target) { showToast('Fill Buyer & Target', 'warning'); return; }
+  state.deals.unshift(d); save(); renderDeals(); closeDealModal();
+  ['dm-buyer','dm-target','dm-value','dm-industry','dm-lesson'].forEach(id => document.getElementById(id).value='');
+  showToast('Deal logged!', 'success');
+}
+function renderDeals() {
+  document.getElementById('deal-body').innerHTML = state.deals.map((d,i) => `
+    <tr>
+      <td><strong>${d.buyer}</strong><br><span style="color:var(--text3);font-size:11px">→ ${d.target}</span></td>
+      <td><span class="deal-val">${d.value}</span><br><span style="color:var(--text3);font-size:10px;font-family:var(--font-mono)">${fmtDate(d.date)}</span></td>
+      <td>${d.industry}</td>
+      <td><span class="deal-tax-badge">${d.taxtype}</span></td>
+      <td style="font-size:11px;max-width:200px">${d.lesson}</td>
+      <td><button class="err-btn" onclick="deleteDeal(${i})">✕</button></td>
+    </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--text3);font-family:var(--font-mono);padding:24px">No deals logged yet. Log your first M&A case study.</td></tr>';
+}
+function deleteDeal(i) { state.deals.splice(i,1); save(); renderDeals(); }
+
+// ═══════════════════════════════════════════
+// GERMAN
+// ═══════════════════════════════════════════
+const PHRASES = [
+  { de: 'Die Eigenkapitalrendite', en: 'Return on Equity (ROE)', level: 'A1 — Basic Finance' },
+  { de: 'die Kapitalflussrechnung', en: 'Cash Flow Statement', level: 'A1 — Accounting' },
+  { de: 'die Discounted-Cashflow-Analyse', en: 'Discounted Cash Flow Analysis', level: 'A2 — Valuation' },
+  { de: 'die Fremdfinanzierungsquote', en: 'Debt-to-Equity Ratio', level: 'A2 — Capital Structure' },
+  { de: 'die Unternehmensübernahme', en: 'Corporate Takeover / Acquisition', level: 'B1 — M&A' },
+  { de: 'die Vermögenswertabschreibung', en: 'Asset Depreciation', level: 'A2 — Accounting' },
+  { de: 'der Jahresabschluss', en: 'Annual Financial Statements', level: 'A2 — Reporting' },
+  { de: 'die Gewinn-und-Verlust-Rechnung', en: 'Income Statement (P&L)', level: 'A1 — Accounting' },
+  { de: 'die Steuerstundung', en: 'Tax Deferral', level: 'B1 — Tax' },
+  { de: 'die Körperschaftsteuer', en: 'Corporate Income Tax', level: 'B1 — Tax' },
+  { de: 'die Schuldverschreibung', en: 'Bond / Debenture', level: 'B1 — Fixed Income' },
+  { de: 'der Buchwert je Aktie', en: 'Book Value Per Share', level: 'A2 — Valuation' },
+  { de: 'die Marktkapitalisierung', en: 'Market Capitalisation', level: 'A1 — Markets' },
+  { de: 'der Unternehmenswert', en: 'Enterprise Value (EV)', level: 'B1 — Valuation' },
+  { de: 'die Hebelwirkung', en: 'Financial Leverage', level: 'B1 — Capital Structure' },
+  { de: 'die Wertpapieraufsichtsbehörde', en: 'Securities Regulatory Authority (BaFin)', level: 'B2 — Regulation' },
+  { de: 'die latente Steuer', en: 'Deferred Tax (DTA/DTL)', level: 'B1 — Tax' },
+  { de: 'die Liquiditätskennzahl', en: 'Liquidity Ratio', level: 'A2 — Analysis' },
+  { de: 'die Beteiligungsgesellschaft', en: 'Investment / Holding Company', level: 'B1 — PE/VC' },
+  { de: 'das Fusionsprotokoll', en: 'Merger Protocol / Prospectus', level: 'B2 — M&A' },
+];
+function renderPhrase() {
+  const p = PHRASES[state.phraseIdx % PHRASES.length];
+  document.getElementById('phrase-de').textContent = p.de;
+  document.getElementById('phrase-en').textContent = p.en;
+  document.getElementById('phrase-level').textContent = p.level;
+}
+function nextPhrase() { state.phraseIdx = (state.phraseIdx+1) % PHRASES.length; save(); renderPhrase(); }
+function prevPhrase() { state.phraseIdx = (state.phraseIdx-1+PHRASES.length) % PHRASES.length; save(); renderPhrase(); }
+function markDoneToday() {
+  const today = todayStr();
+  if (state.lastStreakDate === today) { showToast('Already marked today!'); return; }
+  const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+  const yStr = yesterday.toISOString().slice(0,10);
+  if (state.lastStreakDate === yStr) { state.streak++; }
+  else if (state.lastStreakDate !== today) { state.streak = 1; }
+  state.lastStreakDate = today;
+  if (!state.streakDays.includes(today)) state.streakDays.push(today);
+  save(); renderStreak(); awardXP(15, 'German daily completed');
+  showToast('🇩🇪 Gut gemacht! Streak: ' + state.streak, 'success');
+}
+function renderStreak() {
+  document.getElementById('streak-num').textContent = state.streak;
+  document.getElementById('streak-top').textContent = state.streak + ' day streak';
+  const cal = document.getElementById('streak-calendar');
+  let html = '';
+  const today = todayStr();
+  for (let i=29; i>=0; i--) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const ds = d.toISOString().slice(0,10);
+    const done = state.streakDays.includes(ds);
+    const isToday = ds === today;
+    html += `<div class="streak-dot ${done?'done':''} ${isToday&&done?'today':''}" title="${ds}"></div>`;
+  }
+  cal.innerHTML = html;
+
+  // German levels
+  const levels = [
+    {l:'A1', pct: Math.min(100, state.streak > 0 ? (state.streak/30*100) : 0), color:'#60a5fa'},
+    {l:'A2', pct: Math.max(0, Math.min(100, (state.streak-30)/60*100)), color:'var(--accent)'},
+    {l:'B1', pct: Math.max(0, Math.min(100, (state.streak-90)/90*100)), color:'var(--gold)'},
+    {l:'B2', pct: Math.max(0, Math.min(100, (state.streak-180)/90*100)), color:'var(--green)'},
+  ];
+  document.getElementById('german-progress').innerHTML = levels.map(lv => `
+    <div style="flex:1;min-width:120px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:12px;font-family:var(--font-mono);color:${lv.color}">${lv.l}</span>
+        <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">${Math.round(lv.pct)}%</span>
+      </div>
+      <div style="height:4px;background:var(--surface3);border-radius:2px">
+        <div style="height:100%;width:${lv.pct}%;background:${lv.color};border-radius:2px;transition:width 0.5s"></div>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════
+// CRM
+// ═══════════════════════════════════════════
+function openCRMModal() { document.getElementById('crm-modal').classList.add('open'); }
+function closeCRMModal() { document.getElementById('crm-modal').classList.remove('open'); }
+function saveCRM() {
+  const c = {
+    name: document.getElementById('crm-name').value.trim(),
+    firm: document.getElementById('crm-firm').value.trim(),
+    role: document.getElementById('crm-role').value.trim(),
+    platform: document.getElementById('crm-platform').value,
+    status: document.getElementById('crm-status').value,
+    insight: document.getElementById('crm-insight').value.trim(),
+    date: todayStr()
+  };
+  if (!c.name) { showToast('Enter a name', 'warning'); return; }
+  state.crm.unshift(c); save(); renderCRM(); closeCRMModal();
+  ['crm-name','crm-firm','crm-role','crm-insight'].forEach(id => document.getElementById(id).value='');
+  showToast('Contact saved!', 'success');
+}
+function renderCRM() {
+  const statusMap = { cold:'s-cold', warm:'s-warm', hot:'s-hot' };
+  document.getElementById('crm-body').innerHTML = state.crm.map((c,i) => `
+    <tr>
+      <td>
+        <div class="contact-name">${c.name}</div>
+        <div class="contact-firm">${c.role || ''}</div>
+      </td>
+      <td>${c.firm}</td>
+      <td><span style="font-family:var(--font-mono);font-size:11px;color:var(--text3)">${fmtDate(c.date)}</span><br><span style="font-size:10px;color:var(--text3)">${c.platform}</span></td>
+      <td><span class="status-badge ${statusMap[c.status]}">${c.status.toUpperCase()}</span></td>
+      <td style="font-size:11px;max-width:200px">${c.insight}</td>
+      <td><button class="err-btn" onclick="deleteCRM(${i})">✕</button></td>
+    </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--text3);font-family:var(--font-mono);padding:24px">No contacts yet. Start building your IB network.</td></tr>';
+}
+function deleteCRM(i) { state.crm.splice(i,1); save(); renderCRM(); }
+
+// ═══════════════════════════════════════════
+// ERROR TRACKER
+// ═══════════════════════════════════════════
+function addError() {
+  const topic = document.getElementById('error-topic-input').value.trim();
+  const subject = document.getElementById('error-subject-select').value;
+  if (!topic) { showToast('Enter a topic', 'warning'); return; }
+  const existing = state.errors.find(e => e.topic.toLowerCase() === topic.toLowerCase());
+  if (existing) {
+    existing.count++; existing.lastDate = todayStr();
+  } else {
+    state.errors.push({ topic, subject, count: 1, lastDate: todayStr() });
+  }
+  save(); renderErrors();
+  document.getElementById('error-topic-input').value = '';
+  const e = state.errors.find(e => e.topic.toLowerCase() === topic.toLowerCase());
+  if (e && e.count >= 3) { showToast(`🚨 MANDATORY REVIEW: ${topic}`, 'warning'); }
+  else { showToast('Error logged: ' + topic); }
+}
+function renderErrors() {
+  const criticals = state.errors.filter(e => e.count >= 3);
+  const alert = document.getElementById('error-alert');
+  if (criticals.length > 0) {
+    alert.style.display = 'flex';
+    document.getElementById('error-alert-text').textContent =
+      `MANDATORY REVIEW REQUIRED: ${criticals.map(e=>e.topic).join(' · ')}`;
+  } else { alert.style.display = 'none'; }
+
+  const sorted = [...state.errors].sort((a,b) => b.count - a.count);
+  document.getElementById('error-grid').innerHTML = sorted.map((e,i) => `
+    <div class="error-card ${e.count>=3?'critical':e.count===2?'warn':''}">
+      <div>
+        <div class="error-topic">${e.topic}</div>
+        <div class="error-cat">${e.subject}</div>
+        <div class="error-actions">
+          <button class="err-btn" onclick="incrementError(${state.errors.indexOf(e)})">+1 Error</button>
+          <button class="err-btn" onclick="deleteError(${state.errors.indexOf(e)})">✕</button>
+        </div>
+      </div>
+      <div class="error-count">${e.count}</div>
+    </div>`).join('') || '<div style="color:var(--text3);font-family:var(--font-mono);font-size:12px;padding:20px 0">No errors logged — you\'re clean! 🎯</div>';
+}
+function incrementError(i) { state.errors[i].count++; state.errors[i].lastDate = todayStr(); save(); renderErrors(); }
+function deleteError(i) { state.errors.splice(i,1); save(); renderErrors(); }
+
+// ═══════════════════════════════════════════
+// TOPBAR DATE
+// ═══════════════════════════════════════════
+function updateTopbarDate() {
+  const now = new Date();
+  document.getElementById('topbar-date').textContent =
+    now.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' }) +
+    ' · ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+}
+
+
+// ═══════════════════════════════════════════
+// HABIT TRACKER
+// ═══════════════════════════════════════════
+let editingHabitId = null;
+let selectedEmoji = '💪';
+let selectedColor = '#00e88a';
+let currentHabitView = 'cards';
+
+const CAT_COLORS = {
+  health: '#00e88a', mind: '#00d4ff', career: '#7c3aed',
+  wellness: '#f0c040', social: '#ff8c00', creative: '#e879f9'
+};
+
+function habitDates(h) {
+  return state.habitLogs[h.id] || [];
+}
+function habitDoneToday(h) {
+  return habitDates(h).includes(todayStr());
+}
+function habitStreak(h) {
+  const logs = habitDates(h).sort();
+  if (!logs.length) return 0;
+  let streak = 0;
+  let d = new Date(); d.setHours(0,0,0,0);
+  // if not done today, start counting from yesterday
+  if (!habitDoneToday(h)) d.setDate(d.getDate()-1);
+  while (true) {
+    const ds = d.toISOString().slice(0,10);
+    if (logs.includes(ds)) { streak++; d.setDate(d.getDate()-1); }
+    else break;
+  }
+  return streak;
+}
+function habitTotal(h) { return habitDates(h).length; }
+function habitThisWeek(h) {
+  const logs = habitDates(h);
+  const days = [];
+  for (let i=6; i>=0; i--) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    days.push(d.toISOString().slice(0,10));
+  }
+  return days.filter(d => logs.includes(d)).length;
+}
+function habitCompletionRate(h) {
+  if (!h.createdAt) return 0;
+  const start = new Date(h.createdAt); start.setHours(0,0,0,0);
+  const now = new Date(); now.setHours(0,0,0,0);
+  const daysSince = Math.max(1, Math.round((now-start)/86400000)+1);
+  const targetDays = Math.round(daysSince * (h.frequency/7));
+  const done = habitTotal(h);
+  return Math.min(100, Math.round((done/Math.max(1,targetDays))*100));
+}
+
+function toggleHabitDay(habitId, dateStr) {
+  if (!state.habitLogs[habitId]) state.habitLogs[habitId] = [];
+  const idx = state.habitLogs[habitId].indexOf(dateStr);
+  if (idx > -1) {
+    state.habitLogs[habitId].splice(idx,1);
+  } else {
+    state.habitLogs[habitId].push(dateStr);
+    if (dateStr === todayStr()) awardXP(10, 'Habit completed');
+  }
+  save(); renderHabits();
+}
+
+function openHabitModal(editId) {
+  editingHabitId = editId || null;
+  const modal = document.getElementById('habit-modal');
+  document.getElementById('habit-modal-title').textContent = editId ? 'EDIT HABIT' : 'NEW HABIT';
+  document.getElementById('hm-save-btn').textContent = editId ? 'Update Habit' : 'Save Habit';
+
+  if (editId) {
+    const h = state.habits.find(h => h.id === editId);
+    if (h) {
+      document.getElementById('hm-name').value = h.name;
+      document.getElementById('hm-goal').value = h.goal || '';
+      document.getElementById('hm-frequency').value = h.frequency || 7;
+      document.getElementById('hm-category').value = h.category || 'health';
+      // emoji
+      selectedEmoji = h.emoji;
+      document.querySelectorAll('.emoji-opt').forEach(e => {
+        e.classList.toggle('selected', e.dataset.emoji === h.emoji);
+      });
+      // color
+      selectedColor = h.color;
+      document.querySelectorAll('.color-swatch').forEach(e => {
+        e.classList.toggle('selected', e.dataset.color === h.color);
+      });
+    }
+  } else {
+    document.getElementById('hm-name').value = '';
+    document.getElementById('hm-goal').value = '';
+    document.getElementById('hm-frequency').value = 7;
+    document.getElementById('hm-category').value = 'health';
+    selectedEmoji = '💪'; selectedColor = '#00e88a';
+    document.querySelectorAll('.emoji-opt').forEach(e => e.classList.toggle('selected', e.dataset.emoji==='💪'));
+    document.querySelectorAll('.color-swatch').forEach(e => e.classList.toggle('selected', e.dataset.color==='#00e88a'));
+  }
+  modal.classList.add('open');
+}
+function closeHabitModal() {
+  document.getElementById('habit-modal').classList.remove('open');
+  editingHabitId = null;
+}
+function selectEmoji(el) {
+  document.querySelectorAll('.emoji-opt').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedEmoji = el.dataset.emoji;
+}
+function selectColor(el) {
+  document.querySelectorAll('.color-swatch').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedColor = el.dataset.color;
+}
+function saveHabit() {
+  const name = document.getElementById('hm-name').value.trim();
+  if (!name) { showToast('Enter a habit name', 'warning'); return; }
+  const freq = parseInt(document.getElementById('hm-frequency').value);
+  const goal = document.getElementById('hm-goal').value.trim();
+  const category = document.getElementById('hm-category').value;
+
+  if (editingHabitId) {
+    const h = state.habits.find(h => h.id === editingHabitId);
+    if (h) { h.name=name; h.emoji=selectedEmoji; h.color=selectedColor; h.goal=goal; h.frequency=freq; h.category=category; }
+  } else {
+    const id = 'h_' + Date.now();
+    state.habits.push({ id, name, emoji: selectedEmoji, color: selectedColor, goal, frequency: freq, category, createdAt: todayStr() });
+    if (!state.habitLogs[id]) state.habitLogs[id] = [];
+  }
+  save(); renderHabits(); closeHabitModal();
+  showToast(editingHabitId ? 'Habit updated!' : 'New habit added! 🎯', 'success');
+}
+function deleteHabit(id) {
+  if (!confirm('Delete this habit and all its history?')) return;
+  state.habits = state.habits.filter(h => h.id !== id);
+  delete state.habitLogs[id];
+  save(); renderHabits();
+}
+
+function setHabitView(view, btn) {
+  currentHabitView = view;
+  document.querySelectorAll('#hview-cards,#hview-weekly,#hview-heatmap').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.getElementById('habit-view-cards').style.display = view==='cards' ? '' : 'none';
+  document.getElementById('habit-view-weekly').style.display = view==='weekly' ? '' : 'none';
+  document.getElementById('habit-view-heatmap').style.display = view==='heatmap' ? '' : 'none';
+  if (view==='weekly') renderWeeklyView();
+  if (view==='heatmap') renderHeatmapView();
+}
+
+function renderHabits() {
+  renderCheckinStrip();
+  renderHabitCards();
+  if (currentHabitView==='weekly') renderWeeklyView();
+  if (currentHabitView==='heatmap') renderHeatmapView();
+}
+
+function renderCheckinStrip() {
+  const today = todayStr();
+  const row = document.getElementById('today-checkin-row');
+  const score = document.getElementById('checkin-score');
+  if (!state.habits.length) { row.innerHTML = '<span style="color:var(--text3);font-family:var(--font-mono);font-size:12px">No habits yet — add your first habit to check in daily.</span>'; return; }
+  const done = state.habits.filter(h => habitDoneToday(h)).length;
+  score.textContent = `${done} / ${state.habits.length} done`;
+  score.style.color = done === state.habits.length ? 'var(--green)' : 'var(--text3)';
+  row.innerHTML = state.habits.map(h => {
+    const isDone = habitDoneToday(h);
+    return `<button class="habit-check-today ${isDone?'done':''}"
+      onclick="toggleHabitDay('${h.id}','${today}')"
+      title="${h.name}"
+      style="${isDone ? `background:${h.color};border-color:${h.color}` : `border-color:${h.color}40`}">
+      <span style="font-size:18px">${isDone ? '✓' : h.emoji}</span>
+    </button>`;
+  }).join('') + `<div style="display:flex;flex-direction:column;justify-content:center;margin-left:4px">
+    <div style="font-size:12px;color:var(--text2)">${done === state.habits.length && state.habits.length > 0 ? '🎉 All done today!' : 'Tap to check in'}</div>
+  </div>`;
+}
+
+function renderHabitCards() {
+  const grid = document.getElementById('habit-cards-grid');
+  const empty = document.getElementById('habit-empty');
+  if (!state.habits.length) { grid.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display = 'none';
+  const today = todayStr();
+  // generate last 28 days
+  const last28 = [];
+  for (let i=27; i>=0; i--) { const d=new Date(); d.setDate(d.getDate()-i); last28.push(d.toISOString().slice(0,10)); }
+
+  grid.innerHTML = state.habits.map(h => {
+    const logs = habitDates(h);
+    const streak = habitStreak(h);
+    const total = habitTotal(h);
+    const weekCount = habitThisWeek(h);
+    const rate = habitCompletionRate(h);
+    const isDone = habitDoneToday(h);
+
+    const dotsHtml = last28.map(d => {
+      const done = logs.includes(d);
+      const isT = d===today;
+      const opacity = done ? '1' : '0.15';
+      const border = isT ? `border:2px solid ${h.color}` : '';
+      return `<div class="habit-dot" style="background:${done?h.color:'var(--surface3)'};opacity:${opacity};${border}" title="${d}"></div>`;
+    }).join('');
+
+    return `
+    <div class="habit-card">
+      <div class="habit-card-header">
+        <div class="habit-icon-wrap" style="background:${h.color}20">${h.emoji}</div>
+        <div style="flex:1;min-width:0">
+          <div class="habit-name">${h.name}</div>
+          <div class="habit-goal">${h.goal || (h.frequency+'/7 days')}</div>
+        </div>
+        <button class="habit-check-today ${isDone?'done':''}"
+          onclick="toggleHabitDay('${h.id}','${today}')"
+          style="${isDone?`background:${h.color};border-color:${h.color}`:`border-color:${h.color}60`}">
+          ${isDone ? '✓' : h.emoji}
+        </button>
+      </div>
+
+      <div class="habit-stats-row">
+        <div class="habit-stat">
+          <div class="habit-stat-num" style="color:${h.color}">${streak}</div>
+          <div class="habit-stat-label">Streak</div>
+        </div>
+        <div class="habit-stat">
+          <div class="habit-stat-num" style="color:${h.color}">${weekCount}</div>
+          <div class="habit-stat-label">This Week</div>
+        </div>
+        <div class="habit-stat">
+          <div class="habit-stat-num" style="color:${h.color}">${total}</div>
+          <div class="habit-stat-label">All Time</div>
+        </div>
+        <div class="habit-stat">
+          <div class="habit-stat-num" style="color:${h.color}">${rate}%</div>
+          <div class="habit-stat-label">Rate</div>
+        </div>
+      </div>
+
+      <div class="habit-mini-cal">
+        <div class="habit-mini-cal-label">Last 28 days</div>
+        <div class="habit-dots">${dotsHtml}</div>
+      </div>
+
+      <div class="habit-progress-bar-wrap">
+        <div class="habit-progress-row">
+          <span>Completion rate</span><span>${rate}%</span>
+        </div>
+        <div class="habit-progress-bar">
+          <div class="habit-progress-fill" style="width:${rate}%;background:${h.color}"></div>
+        </div>
+      </div>
+
+      <div class="habit-actions">
+        <button class="err-btn" onclick="openHabitModal('${h.id}')" style="font-size:11px">✏ Edit</button>
+        <button class="err-btn" onclick="deleteHabit('${h.id}')" style="font-size:11px;color:var(--red)">✕ Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderWeeklyView() {
+  // Day labels
+  const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const weekDays = [];
+  const now = new Date();
+  const dow = (now.getDay()+6)%7; // 0=Mon
+  for (let i=6; i>=0; i--) {
+    const d = new Date(); d.setDate(d.getDate()-(6-i));
+    weekDays.push({ ds: d.toISOString().slice(0,10), label: dayNames[(d.getDay()+6)%7], isToday: d.toISOString().slice(0,10)===todayStr() });
+  }
+
+  document.getElementById('weekly-day-labels').innerHTML = weekDays.map(d =>
+    `<div class="wday-dot" style="${d.isToday?'background:var(--surface3);border:1px solid var(--border2);color:var(--text)':''}">${d.label}</div>`
+  ).join('');
+
+  document.getElementById('weekly-habit-list').innerHTML = state.habits.map(h => {
+    const logs = habitDates(h);
+    const dotsHtml = weekDays.map(d => {
+      const done = logs.includes(d.ds);
+      return `<div class="wday-dot hit" style="${done?`background:${h.color};cursor:pointer`:`background:var(--surface3)`}"
+        onclick="toggleHabitDay('${h.id}','${d.ds}')"
+        title="${d.ds}">${done ? '✓' : ''}</div>`;
+    }).join('');
+    const weekDone = weekDays.filter(d => logs.includes(d.ds)).length;
+    return `<div class="weekly-habit-row">
+      <div class="weekly-habit-name">
+        <span>${h.emoji}</span>
+        <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${h.name}</span>
+      </div>
+      <div class="weekly-dots">${dotsHtml}</div>
+      <div class="weekly-pct" style="color:${h.color}">${weekDone}/${weekDays.length}</div>
+    </div>`;
+  }).join('') || '<div style="color:var(--text3);font-family:var(--font-mono);font-size:12px;padding:24px 0;text-align:center">No habits yet.</div>';
+}
+
+function renderHeatmapView() {
+  const container = document.getElementById('heatmap-container');
+  if (!state.habits.length) {
+    container.innerHTML = '<div style="color:var(--text3);font-family:var(--font-mono);font-size:12px;padding:24px 0;text-align:center">No habits yet.</div>';
+    return;
+  }
+
+  // Build a combined heatmap (all habits) + per-habit
+  // 16 weeks = 112 days
+  const WEEKS = 16;
+  const DAYS = WEEKS * 7;
+  const allDays = [];
+  for (let i=DAYS-1; i>=0; i--) {
+    const d = new Date(); d.setDate(d.getDate()-i); allDays.push(d.toISOString().slice(0,10));
+  }
+
+  // Per-habit heatmaps
+  let html = '';
+  state.habits.forEach(h => {
+    const logs = new Set(habitDates(h));
+    // Split into weeks (cols)
+    const cols = [];
+    for (let w=0; w<WEEKS; w++) {
+      const col = allDays.slice(w*7, w*7+7);
+      cols.push(col);
+    }
+    const cells = cols.map(col => `
+      <div class="heatmap-col">
+        ${col.map(d => {
+          const done = logs.has(d);
+          const isT = d===todayStr();
+          return `<div class="heatmap-cell" style="background:${done?h.color:'var(--surface3)'};opacity:${done?0.9:0.3};${isT?'outline:1px solid white':''}" title="${d}"></div>`;
+        }).join('')}
+      </div>`).join('');
+
+    html += `<div class="heatmap-wrap">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <span style="font-size:20px">${h.emoji}</span>
+        <span style="font-size:14px;font-weight:600;color:var(--text)">${h.name}</span>
+        <span style="font-size:11px;font-family:var(--font-mono);color:var(--text3);margin-left:auto">${habitTotal(h)} total · ${habitStreak(h)} streak · ${habitCompletionRate(h)}% rate</span>
+      </div>
+      <div class="heatmap-grid">${cells}</div>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+function init() {
+  // Restore state
+  document.body.setAttribute('data-mode', state.mode);
+  document.body.setAttribute('data-lang', state.lang);
+  setMode(state.mode);
+  setLang(state.lang);
+
+  // Render all
+  renderPhaseBanner();
+  renderCountdowns();
+  updateHomeStats();
+  renderGantt();
+  renderPomoLog();
+  renderBurnout();
+  renderBridge();
+  renderDict();
+  renderDeals();
+  renderPhrase();
+  renderStreak();
+  renderCRM();
+  renderErrors();
+  renderHabits();
+  updateTopbarDate();
+  updatePomoDisplay();
+
+  setInterval(updateTopbarDate, 60000);
+
+  // Close modals on overlay click
+  document.getElementById('deal-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeDealModal();
+  });
+  document.getElementById('crm-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeCRMModal();
+  });
+  document.getElementById('habit-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeHabitModal();
+  });
+
+  // Enter key for inputs
+  document.getElementById('task-input').addEventListener('keydown', e => { if (e.key==='Enter') addTask(); });
+  document.getElementById('error-topic-input').addEventListener('keydown', e => { if (e.key==='Enter') addError(); });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
